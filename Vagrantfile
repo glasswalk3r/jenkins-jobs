@@ -68,7 +68,8 @@ Vagrant.configure("2") do |config|
     set -e
     yum makecache fast
     yum upgrade -y
-    yum group install 'Development Tools' git python3-pip -y java-11-openjdk bzip2-devel libsqlite3x-devel glibc-common tk-devel python36-xmltodict
+    yum group install 'Development Tools'
+    yum install -y git python3-pip java-11-openjdk bzip2-devel libsqlite3x-devel glibc-common tk-devel python36-xmltodict
     wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     yum makecache fast
