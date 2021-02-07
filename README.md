@@ -24,18 +24,52 @@ with zero configuration:
 $ vagrant up
 ```
 
-After the setup is complete, fire up the commands below. Be sure to replace
-`you:yourkey` with your proper credentials after creating an user in Jenkins:
+After the setup is complete, fire up the commands below:
 
 ```
 $ vagrant ssh
-$ java -jar jenkins-cli.jar -s http://localhost:8080/ -webSocket -auth you:yourkey list-jobs
-freestyle
-pipeline
+$ java -jar jenkins-cli.jar -s http://localhost:8080/ -webSocket -auth alceu:1124ffc2b50cf9f73f1a177254f8d57c9f list-jobs
+freestyle-sample
+pipeline-sample
 ```
 
-Not very exciting output. So I tried the REST API with the `sample.py` Python 3
-program. Same thing, basically.
+Not very exciting output.
+
+So I tried the Jenkins
+[REST API](https://python-jenkins.readthedocs.io/en/latest/) with the
+`sample.py` Python 3 program:
+
+```
+$ cd /vagrant
+$ ./sample.py
+{'_class': 'hudson.model.FreeStyleProject', 'name': 'freestyle-sample', 'url': 'http://localhost:8080/job/freestyle-sample/', 'color': 'notbuilt', 'fullname': 'freestyle-sample'}
+XML information:
+OrderedDict([('project',
+              OrderedDict([('keepDependencies', 'false'),
+                           ('properties', None),
+                           ('scm',
+                            OrderedDict([('@class', 'hudson.scm.NullSCM')])),
+                           ('canRoam', 'false'),
+                           ('disabled', 'false'),
+                           ('blockBuildWhenDownstreamBuilding', 'false'),
+                           ('blockBuildWhenUpstreamBuilding', 'false'),
+                           ('triggers', None),
+                           ('concurrentBuild', 'false'),
+                           ('builders', None),
+                           ('publishers', None),
+                           ('buildWrappers', None)]))])
+{'_class': 'org.jenkinsci.plugins.workflow.job.WorkflowJob', 'name': 'pipeline-sample', 'url': 'http://localhost:8080/job/pipeline-sample/', 'color': 'notbuilt', 'fullname': 'pipeline-sample'}
+XML information:
+OrderedDict([('flow-definition',
+              OrderedDict([('@plugin', 'workflow-job@2.40'),
+                           ('keepDependencies', 'false'),
+                           ('properties', None),
+                           ('triggers', None),
+                           ('disabled', 'false')]))])
+```
+
+If you take in consideration this is almost raw output, it's an improvement
+because of the additional details, but far to be enough.
 
 ## Refences
 

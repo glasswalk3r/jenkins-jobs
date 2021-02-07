@@ -17,7 +17,7 @@ Vagrant.configure('2') do |config|
     vb.cpus = '2'
   end
 
-  config.vm.provision 'shell', inline: <<-SHELL
+  config.vm.provision 'shell', inline: <<~SHELL
     set -e
     yum makecache fast
     yum upgrade -y
@@ -29,6 +29,18 @@ Vagrant.configure('2') do |config|
     yum install jenkins -y
     systemctl enable jenkins
     systemctl start jenkins
-    cat /var/lib/jenkins/secrets/initialAdminPassword
+    pwd_file=/var/lib/jenkins/secrets/initialAdminPassword
+
+    while test 1
+    do
+          if ![ -f "${pwd_file}" ]
+          then
+              sleep 5
+          else
+              echo 'Initial admin password for Jenkins:'
+              cat "${pwd_file}"
+              break
+          fi
+    done
   SHELL
 end
