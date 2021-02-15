@@ -1,3 +1,4 @@
+include config.mk
 VIRTUALENV:=$(shell basename $$PWD)
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
