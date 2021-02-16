@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import xmltodict
 import jenkins
 
-from jenkins_jobs import PipelineJob, MavenJob, FreestyleJob, PluginBasedJob
+from jenkins_jobs.jobs import PipelineJob, MavenJob, FreestyleJob, PluginBasedJob
 
 
 class Retriever(ABC):

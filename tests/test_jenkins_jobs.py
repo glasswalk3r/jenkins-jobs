@@ -5,7 +5,7 @@
 import pytest
 
 
-from jenkins_jobs import jenkins_jobs
+from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob, FreestyleJob
 
 
 @pytest.fixture
