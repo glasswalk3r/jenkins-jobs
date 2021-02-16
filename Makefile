@@ -90,7 +90,7 @@ config:
 	pyenv virtualenv $(VIRTUALENV)
 	pyenv local $(VIRTUALENV)
 	pip install --upgrade pip wheel
-	pip install -r requirements-dev.txt
+	pip install -r requirements_dev.txt
 
 debug:
 	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar
