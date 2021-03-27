@@ -12,5 +12,8 @@ def test_jenkinsjob_class():
     for method in methods:
         assert hasattr(JenkinsJob, method)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as excinfo:
         JenkinsJob('foobar', {})
+
+    assert "Can't instantiate abstract class JenkinsJob with abstract methods _find_desc, _find_timer_trigger" in str(
+        excinfo.value)
