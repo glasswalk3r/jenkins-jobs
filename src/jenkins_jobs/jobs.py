@@ -42,12 +42,14 @@ class JenkinsJob(ABC):
         else:
             self.description = '*** MISSING DESCRIPTION ***'
 
-    def _clean_spec(self, timer_spec):
+    @staticmethod
+    def _clean_spec(timer_spec):
         spec = None
 
         if timer_spec is None:
             return spec
 
+        clean_lines = deque()
         normalized = timer_spec.replace('\r\n', '\n')
         lines = normalized.split('\n')
 
@@ -55,9 +57,9 @@ class JenkinsJob(ABC):
             if line.startswith('#') or line == '':
                 continue
             else:
-                spec = line
+                clean_lines.append(line)
 
-        return spec
+        return '\n'.join(clean_lines)
 
     def __str__(self):
         if self.timer_trigger_based:
