@@ -30,6 +30,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     description="Listing all jobs on a Jenkins server with more information than their respective",
     entry_points={
