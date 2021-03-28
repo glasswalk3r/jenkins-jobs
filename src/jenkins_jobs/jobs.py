@@ -4,6 +4,8 @@ from collections import deque
 from abc import ABC, abstractmethod
 import sys
 
+from jenkins_jobs.exception import MissingXMLElementError
+
 
 class JenkinsJob(ABC):
     timer_trigger_node = 'hudson.triggers.TimerTrigger'
@@ -118,9 +120,7 @@ TriggersJobProperty'
                         if self.timer_trigger_spec:
                             self.timer_trigger_based = True
         except KeyError as e:
-            msg = 'Could not locate "{0}" key while searching for a timer \
-trigger in {1}'
-            raise Exception(msg.format(e, self.name))
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
 
 
 class PipelineJob(PluginBasedJob):

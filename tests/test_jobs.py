@@ -1,8 +1,10 @@
 """Tests for `jenkins_jobs` package."""
 import inspect
 import pytest
+import xmltodict
 
 from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob, FreestyleJob
+from jenkins_jobs.exception import MissingXMLElementError
 
 
 def test_jenkinsjob_class():
@@ -20,6 +22,7 @@ def test_jenkinsjob_methods():
 
     for method in methods:
         assert hasattr(JenkinsJob, method)
+        inspect.ismethod(getattr(JenkinsJob, method))
 
 
 def test_clean_spec_crlf_multiple():
@@ -48,3 +51,42 @@ def test_clean_spec_empty_line():
     expected = 'Followed by an actually comment'
 
     assert expected == JenkinsJob._clean_spec(data)
+
+
+def test_pluginbasedjob_class():
+    assert issubclass(PluginBasedJob, JenkinsJob)
+
+    attribs = ('root_node', 'trigger_cfg_node')
+
+    for attribute in attribs:
+        assert hasattr(PluginBasedJob, attribute)
+
+
+def test_pluginbasedjob_methods():
+    methods = ('_plugin_type', 'plugin')
+
+    for method in methods:
+        assert hasattr(PluginBasedJob, method)
+        inspect.ismethod(getattr(PluginBasedJob, method))
+
+
+def test_pluginbasedjob_instance():
+    config = {}
+
+    with open('tests/raw_data/workflow-job-plugin.xml', 'r') as fp:
+        config['definition'] = xmltodict.parse(fp.read())
+
+    with pytest.raises(MissingXMLElementError) as excinfo:
+        PluginBasedJob('Workflow Job Plugin sample', config)
+
+    # fails because the class attribute root_node is None
+    assert 'None' in str(excinfo.value)
+
+
+def test_pipelinejob_instance():
+    config = {}
+
+    with open('tests/raw_data/workflow-job-plugin.xml', 'r') as fp:
+        config['definition'] = xmltodict.parse(fp.read())
+
+    PipelineJob('Workflow Job Plugin sample', config)
