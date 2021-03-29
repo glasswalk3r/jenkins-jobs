@@ -17,7 +17,7 @@ class Retriever(ABC):
 
     @abstractmethod
     def all_jobs():
-        pass
+        pass  # pragma: no cover
 
     @classmethod
     def _job_builder(cls, name, config):
@@ -40,7 +40,7 @@ class FileSystemRetriever(Retriever):
     """."""
 
     def __init__(self, shelve_file_path):
-        self.shelf = shelve.open(shelve_file_path, flag='r')
+        self.shelf = shelve.open(shelve_file_path, flag='r')  # pragma: no cover
 
     def all_jobs(self):
 
@@ -55,7 +55,7 @@ class RESTRetriever(Retriever):
 
     def __init__(self, user, token, jenkins_server):
         self.server = jenkins.Jenkins(jenkins_server, username=user,
-                                      password=token)
+                                      password=token)  # pragma: no cover
 
     def all_jobs(self):
 
