@@ -4,7 +4,7 @@ from collections import deque
 from abc import ABC, abstractmethod
 import sys
 
-from jenkins_jobs.exception import MissingXMLElementError
+from jenkins_jobs.exceptions import MissingXMLElementError
 
 
 class JenkinsJob(ABC):

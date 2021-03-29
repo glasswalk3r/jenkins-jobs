@@ -4,7 +4,7 @@ import pytest
 import xmltodict
 
 from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob, FreestyleJob
-from jenkins_jobs.exception import MissingXMLElementError
+from jenkins_jobs.exceptions import MissingXMLElementError
 
 
 def test_jenkinsjob_class():
