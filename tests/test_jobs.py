@@ -7,6 +7,15 @@ from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob,
 from jenkins_jobs.exceptions import MissingXMLElementError
 
 
+def xml_config(xml_filename):
+    config = {}
+
+    with open(f'tests/raw_data/{xml_filename}', 'r') as fp:
+        config['definition'] = xmltodict.parse(fp.read())
+
+    return config
+
+
 def test_jenkinsjob_class():
     assert inspect.isclass(JenkinsJob)
 
@@ -71,10 +80,7 @@ def test_pluginbasedjob_methods():
 
 
 def test_pluginbasedjob_instance():
-    config = {}
-
-    with open('tests/raw_data/workflow-job-plugin.xml', 'r') as fp:
-        config['definition'] = xmltodict.parse(fp.read())
+    config = xml_config('workflow-job-plugin.xml')
 
     with pytest.raises(MissingXMLElementError) as excinfo:
         PluginBasedJob('Workflow Job Plugin sample', config)
@@ -84,9 +90,8 @@ def test_pluginbasedjob_instance():
 
 
 def test_pipelinejob_instance():
-    config = {}
-
-    with open('tests/raw_data/workflow-job-plugin.xml', 'r') as fp:
-        config['definition'] = xmltodict.parse(fp.read())
-
-    PipelineJob('Workflow Job Plugin sample', config)
+    config = xml_config('workflow-job-plugin.xml')
+    instance = PipelineJob('Workflow Job Plugin sample', config)
+    assert instance.root_node == 'flow-definition'
+    assert instance.description == 'Sample description for PipelineJob'
+    assert instance.timer_trigger_based is False
