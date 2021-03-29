@@ -4,7 +4,6 @@ import pytest
 import xmltodict
 
 from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob, FreestyleJob
-from jenkins_jobs.exceptions import MissingXMLElementError
 
 
 def xml_config(xml_filename):
@@ -124,3 +123,24 @@ def test_mavenjob_instance():
 https://plugins.jenkins.io/maven-plugin/'
     assert instance.timer_trigger_based is True
     assert instance.timer_trigger_spec == 'H H 1,15 1-11 *'
+
+
+def test_freestyle_class():
+    assert issubclass(FreestyleJob, JenkinsJob)
+    assert hasattr(FreestyleJob, 'root_node')
+
+
+def test_freestyle_instance():
+    config = xml_config('freestyle-job.xml')
+    instance = FreestyleJob('freestyle-sample', config)
+    assert instance.root_node == 'project'
+    assert instance.description == 'Sample freestyle job'
+    assert instance.timer_trigger_based is False
+
+
+def test_freestyle_instance_trigger():
+    config = xml_config('freestyle-job-trigger.xml')
+    instance = FreestyleJob('freestyle-sample', config)
+    assert instance.root_node == 'project'
+    assert instance.description == 'Sample freestyle job'
+    assert instance.timer_trigger_based is True
