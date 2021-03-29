@@ -4,8 +4,8 @@ import jenkins
 from pprint import pprint
 import xmltodict
 
-token = '1124ffc2b50cf9f73f1a177254f8d57c9f'
-server = jenkins.Jenkins('http://localhost:8080', username='alceu',
+token = '117037154ffabf2db2fc72a7bc8d33d116'
+server = jenkins.Jenkins('http://localhost:8080', username='admin',
                          password=token)
 
 for job in server.get_jobs():
