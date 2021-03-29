@@ -18,3 +18,12 @@ class UnknownJobTypeError(JenkinsJobError):
 
     def __str__(self):
         return self.message
+
+
+class InvalidXMLConfigError(JenkinsJobError):
+    def __init__(self, root_key):
+        self.root_key = root_key
+        self.message = f'Unexpected data, missing {root_key} root key in data structure'
+
+    def __str__(self):
+        return self.message

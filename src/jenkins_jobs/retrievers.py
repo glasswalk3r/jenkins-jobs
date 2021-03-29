@@ -5,7 +5,7 @@ import xmltodict
 import jenkins
 
 from jenkins_jobs.jobs import PipelineJob, MavenJob, FreestyleJob, PluginBasedJob
-from jenkins_jobs.exceptions import UnknownJobTypeError
+from jenkins_jobs.exceptions import UnknownJobTypeError, InvalidXMLConfigError
 
 
 class Retriever(ABC):
@@ -33,8 +33,7 @@ class Retriever(ABC):
                 except KeyError as e:
                     raise UnknownJobTypeError(str(e))
         except KeyError as e:
-            msg = 'Unexpected data, missing {} root key in data structure'
-            print(msg.format(e))
+            raise InvalidXMLConfigError(str(e))
 
 
 class FileSystemRetriever(Retriever):

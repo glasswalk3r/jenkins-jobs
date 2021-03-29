@@ -3,7 +3,7 @@ import inspect
 import pytest
 
 from jenkins_jobs.retrievers import Retriever, FileSystemRetriever, RESTRetriever
-from jenkins_jobs.exceptions import UnknownJobTypeError
+from jenkins_jobs.exceptions import UnknownJobTypeError, InvalidXMLConfigError
 
 
 def test_retriever_class():
@@ -40,8 +40,16 @@ def test_retriever_subclass(klass):
 def test_retriever_bogus_raises_exception(helpers):
     config = helpers.xml_config('bogus-plugin.xml')
 
-    with pytest.raises(UnknownJobTypeError):
+    with pytest.raises(UnknownJobTypeError) as excinfo:
         Retriever._job_builder('Bogus Plugin sample', config)
 
-    # assert "Can't instantiate abstract class PluginBasedJob with abstract method _find_timer_trigger" == str(
-    #     excinfo.value)
+    assert 'foobar' in str(excinfo.value)
+
+
+def test_retriever_invalid_raises_exception():
+    config = {}
+
+    with pytest.raises(InvalidXMLConfigError) as excinfo:
+        Retriever._job_builder('Bogus Plugin sample', config)
+
+    assert 'definition' in str(excinfo.value)
