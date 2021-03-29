@@ -135,7 +135,8 @@ def test_freestyle_class():
 
 @pytest.mark.parametrize('job_name, xml_filename, element, context, klass', [
     ('maven job', 'maven-job-plugin-bogus.xml', 'spec', 'a timer trigger', MavenJob),
-    ('freestyle job', 'freestyle-job-bogus.xml', 'description', 'the job description', FreestyleJob)
+    ('freestyle job', 'freestyle-job-bogus.xml', 'description', 'the job description', FreestyleJob),
+    ('pipeline job', 'workflow-job-plugin-bogus.xml', 'spec', 'a timer trigger', PipelineJob)
 ])
 def test_bogus_instance(job_name, xml_filename, element, context, klass):
     config = xml_config(xml_filename)
