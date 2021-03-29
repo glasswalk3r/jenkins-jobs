@@ -84,7 +84,6 @@ class JenkinsJob(ABC):
 
 class PluginBasedJob(JenkinsJob):
     root_node = None
-    trigger_cfg_node = None
 
     @staticmethod
     def _plugin_type(config):
@@ -104,15 +103,15 @@ class PluginBasedJob(JenkinsJob):
 
 class PipelineJob(PluginBasedJob):
     root_node = 'flow-definition'
-    trigger_cfg_node = 'org.jenkinsci.plugins.workflow.job.properties.Pipeline\
+    trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.Pipeline\
 TriggersJobProperty'
 
     def _find_timer_trigger(self, config):
         try:
             tmp = config['definition'][self.root_node]['properties']
 
-            if self.trigger_cfg_node in tmp:
-                tmp = tmp[self.trigger_cfg_node]
+            if self.trigger_grandparent_node in tmp:
+                tmp = tmp[self.trigger_grandparent_node]
 
                 if tmp and 'triggers' in tmp:
                     tmp = tmp['triggers']
@@ -130,14 +129,14 @@ TriggersJobProperty'
 
 class MavenJob(PluginBasedJob):
     root_node = 'maven2-moduleset'
-    trigger_cfg_node = 'triggers'
+    trigger_parent_node = 'triggers'
 
     def _find_timer_trigger(self, config):
         try:
             tmp = config['definition'][self.root_node]
 
-            if self.trigger_cfg_node in tmp:
-                tmp = tmp[self.trigger_cfg_node]
+            if self.trigger_parent_node in tmp:
+                tmp = tmp[self.trigger_parent_node]
 
                 if tmp and self.timer_trigger_node in tmp:
                     self.timer_trigger_spec = self._clean_spec(

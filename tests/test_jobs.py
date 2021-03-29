@@ -65,7 +65,7 @@ def test_clean_spec_empty_line():
 def test_pluginbasedjob_class():
     assert issubclass(PluginBasedJob, JenkinsJob)
 
-    attribs = ('root_node', 'trigger_cfg_node')
+    attribs = tuple(['root_node'])
 
     for attribute in attribs:
         assert hasattr(PluginBasedJob, attribute)
@@ -89,6 +89,11 @@ def test_pluginbasedjob_instance():
         excinfo.value)
 
 
+def test_pipelinejob_class():
+    assert issubclass(PipelineJob, PluginBasedJob)
+    assert hasattr(PipelineJob, 'trigger_grandparent_node')
+
+
 def test_pipelinejob_instance():
     config = xml_config('workflow-job-plugin.xml')
     instance = PipelineJob('Workflow Job Plugin sample', config)
@@ -104,6 +109,11 @@ def test_pipelinejob_instance_scheduler():
     assert instance.description == 'This is a sample pipeline job with timer trigger'
     assert instance.timer_trigger_based is True
     assert instance.timer_trigger_spec == 'H/15 * * * *'
+
+
+def test_mavenjob_class():
+    assert issubclass(MavenJob, PluginBasedJob)
+    assert hasattr(MavenJob, 'trigger_parent_node')
 
 
 def test_mavenjob_instance():
