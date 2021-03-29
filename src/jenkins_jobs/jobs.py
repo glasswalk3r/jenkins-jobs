@@ -2,7 +2,6 @@
 
 from collections import deque
 from abc import ABC, abstractmethod
-import sys
 
 from jenkins_jobs.exceptions import MissingXMLElementError
 
@@ -20,11 +19,11 @@ class JenkinsJob(ABC):
 
     @abstractmethod
     def _find_desc(self, config):
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _find_timer_trigger(self, config):
-        pass
+        pass  # pragma: no cover
 
     def _onliner(self, config):
         description = self._find_desc(config)

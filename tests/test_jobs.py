@@ -4,6 +4,7 @@ import pytest
 import xmltodict
 
 from jenkins_jobs.jobs import JenkinsJob, PluginBasedJob, PipelineJob, MavenJob, FreestyleJob
+from jenkins_jobs.exceptions import MissingXMLElementError
 
 
 def xml_config(xml_filename):
@@ -80,6 +81,7 @@ def test_pluginbasedjob_methods():
 
 def test_pluginbasedjob_instance():
     config = xml_config('workflow-job-plugin.xml')
+    assert PluginBasedJob.plugin(config) == 'workflow-job'
 
     with pytest.raises(TypeError) as excinfo:
         PluginBasedJob('Workflow Job Plugin sample', config)
@@ -95,6 +97,7 @@ def test_pipelinejob_class():
 
 def test_pipelinejob_instance():
     config = xml_config('workflow-job-plugin.xml')
+    assert PipelineJob.plugin(config) == 'workflow-job'
     instance = PipelineJob('Workflow Job Plugin sample', config)
     assert instance.root_node == 'flow-definition'
     assert instance.description == 'Sample description for PipelineJob'
@@ -125,9 +128,31 @@ https://plugins.jenkins.io/maven-plugin/'
     assert instance.timer_trigger_spec == 'H H 1,15 1-11 *'
 
 
+def test_mavenjob_instance_bogus():
+    config = xml_config('maven-job-plugin-bogus.xml')
+    job_name = 'maven job'
+
+    with pytest.raises(MissingXMLElementError) as excinfo:
+        MavenJob(job_name, config)
+
+    msg = f'Could not locate \'spec\' element while searching for a timer trigger in "{job_name}"'
+    assert msg == str(excinfo.value)
+
+
 def test_freestyle_class():
     assert issubclass(FreestyleJob, JenkinsJob)
     assert hasattr(FreestyleJob, 'root_node')
+
+
+def test_freestyle_instance_bogus():
+    job_name = 'freestyle job'
+    config = xml_config('freestyle-job-bogus.xml')
+
+    with pytest.raises(MissingXMLElementError) as excinfo:
+        FreestyleJob(job_name, config)
+
+    msg = f'Could not locate \'description\' element while searching for the job description in "{job_name}"'
+    assert msg == str(excinfo.value)
 
 
 def test_freestyle_instance():
@@ -136,6 +161,7 @@ def test_freestyle_instance():
     assert instance.root_node == 'project'
     assert instance.description == 'Sample freestyle job'
     assert instance.timer_trigger_based is False
+    assert str(instance) == 'freestyle-sample|FreestyleJob|Sample freestyle job|False|not applicable'
 
 
 def test_freestyle_instance_trigger():
@@ -144,3 +170,13 @@ def test_freestyle_instance_trigger():
     assert instance.root_node == 'project'
     assert instance.description == 'Sample freestyle job'
     assert instance.timer_trigger_based is True
+    assert str(instance) == 'freestyle-sample|FreestyleJob|Sample freestyle job|True|H H 1,15 1-11 *'
+
+
+def test_freestyle_instance_no_desc():
+    config = xml_config('freestyle-job-nodesc.xml')
+    instance = FreestyleJob('freestyle-sample', config)
+    assert instance.root_node == 'project'
+    assert instance.description == '*** MISSING DESCRIPTION ***'
+    assert instance.timer_trigger_based is False
+    assert str(instance) == 'freestyle-sample|FreestyleJob|*** MISSING DESCRIPTION ***|False|not applicable'
