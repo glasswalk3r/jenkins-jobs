@@ -18,7 +18,8 @@ class Retriever(ABC):
     def all_jobs():
         pass
 
-    def _job_builder(self, name, config):
+    @classmethod
+    def _job_builder(cls, name, config):
 
         try:
             if 'project' in config['definition']:
@@ -27,7 +28,7 @@ class Retriever(ABC):
             else:
                 plugin = PluginBasedJob.plugin(config)
                 try:
-                    return self.plugin_based_jobs[plugin](name, config)
+                    return cls.plugin_based_jobs[plugin](name, config)
                 except KeyError as e:
                     raise Exception('Unknown job type "{}"'.format(e))
         except KeyError as e:
