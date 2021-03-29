@@ -2,7 +2,8 @@
 import inspect
 import pytest
 
-from jenkins_jobs.retrievers import Retriever
+from jenkins_jobs.retrievers import Retriever, FileSystemRetriever, RESTRetriever
+from jenkins_jobs.exceptions import UnknownJobTypeError
 
 
 def test_retriever_class():
@@ -28,3 +29,19 @@ def test_retriever_builder(job_name, xml_filename, klass, helpers):
     config = helpers.xml_config(xml_filename)
     instance = Retriever._job_builder(job_name, config)
     assert instance.__class__.__name__ == klass
+
+
+@pytest.mark.parametrize('klass', [FileSystemRetriever, RESTRetriever])
+def test_retriever_subclass(klass):
+    assert issubclass(klass, Retriever)
+    assert hasattr(klass, '__init__')
+
+
+def test_retriever_bogus_raises_exception(helpers):
+    config = helpers.xml_config('bogus-plugin.xml')
+
+    with pytest.raises(UnknownJobTypeError):
+        Retriever._job_builder('Bogus Plugin sample', config)
+
+    # assert "Can't instantiate abstract class PluginBasedJob with abstract method _find_timer_trigger" == str(
+    #     excinfo.value)

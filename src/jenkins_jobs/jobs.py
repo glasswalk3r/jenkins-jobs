@@ -86,6 +86,7 @@ class PluginBasedJob(JenkinsJob):
 
     @staticmethod
     def _plugin_type(config):
+        # <flow-definition plugin="workflow-job@2.36">
         return next(iter(config['definition']))
 
     @staticmethod

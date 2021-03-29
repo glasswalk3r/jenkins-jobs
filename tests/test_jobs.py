@@ -69,7 +69,7 @@ def test_pluginbasedjob_methods():
         inspect.ismethod(getattr(PluginBasedJob, method))
 
 
-def test_pluginbasedjob_instance(helpers):
+def test_pluginbasedjob_instance_raises_exception(helpers):
     config = helpers.xml_config('workflow-job-plugin.xml')
     assert PluginBasedJob.plugin(config) == 'workflow-job'
 
