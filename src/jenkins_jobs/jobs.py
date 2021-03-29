@@ -156,7 +156,7 @@ class FreestyleJob(JenkinsJob):
         try:
             return config['definition'][self.root_node]['description']
         except KeyError as e:
-            print('Missing {} property'.format(e), file=sys.stderr)
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context='the job description')
 
         return None
 
@@ -172,5 +172,4 @@ class FreestyleJob(JenkinsJob):
                 if self.timer_trigger_spec:
                     self.timer_trigger_based = True
         except KeyError as e:
-            msg = 'Could not locate {} while searching for a time trigger'
-            raise Exception(msg.format(e))
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
