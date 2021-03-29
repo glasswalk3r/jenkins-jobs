@@ -82,11 +82,11 @@ def test_pluginbasedjob_methods():
 def test_pluginbasedjob_instance():
     config = xml_config('workflow-job-plugin.xml')
 
-    with pytest.raises(MissingXMLElementError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         PluginBasedJob('Workflow Job Plugin sample', config)
 
-    # fails because the class attribute root_node is None
-    assert 'None' in str(excinfo.value)
+    assert "Can't instantiate abstract class PluginBasedJob with abstract method _find_timer_trigger" == str(
+        excinfo.value)
 
 
 def test_pipelinejob_instance():
@@ -95,3 +95,22 @@ def test_pipelinejob_instance():
     assert instance.root_node == 'flow-definition'
     assert instance.description == 'Sample description for PipelineJob'
     assert instance.timer_trigger_based is False
+
+
+def test_pipelinejob_instance_scheduler():
+    config = xml_config('workflow-job-plugin-timer.xml')
+    instance = PipelineJob('Workflow Job Plugin sample', config)
+    assert instance.root_node == 'flow-definition'
+    assert instance.description == 'This is a sample pipeline job with timer trigger'
+    assert instance.timer_trigger_based is True
+    assert instance.timer_trigger_spec == 'H/15 * * * *'
+
+
+def test_mavenjob_instance():
+    config = xml_config('maven-job-plugin.xml')
+    instance = MavenJob('Maven Job Plugin sample', config)
+    assert instance.root_node == 'maven2-moduleset'
+    assert instance.description == 'This is a sample Maven plugin based job, see \
+https://plugins.jenkins.io/maven-plugin/'
+    assert instance.timer_trigger_based is True
+    assert instance.timer_trigger_spec == 'H H 1,15 1-11 *'

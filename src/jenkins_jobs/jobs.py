@@ -84,8 +84,7 @@ class JenkinsJob(ABC):
 
 class PluginBasedJob(JenkinsJob):
     root_node = None
-    trigger_cfg_node = 'org.jenkinsci.plugins.workflow.job.properties.Pipeline\
-TriggersJobProperty'
+    trigger_cfg_node = None
 
     @staticmethod
     def _plugin_type(config):
@@ -101,6 +100,12 @@ TriggersJobProperty'
     def _find_desc(self, config):
         plugin_type = PluginBasedJob._plugin_type(config)
         return config['definition'][plugin_type]['description']
+
+
+class PipelineJob(PluginBasedJob):
+    root_node = 'flow-definition'
+    trigger_cfg_node = 'org.jenkinsci.plugins.workflow.job.properties.Pipeline\
+TriggersJobProperty'
 
     def _find_timer_trigger(self, config):
         try:
@@ -123,12 +128,26 @@ TriggersJobProperty'
             raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
 
 
-class PipelineJob(PluginBasedJob):
-    root_node = 'flow-definition'
-
-
 class MavenJob(PluginBasedJob):
     root_node = 'maven2-moduleset'
+    trigger_cfg_node = 'triggers'
+
+    def _find_timer_trigger(self, config):
+        try:
+            tmp = config['definition'][self.root_node]
+
+            if self.trigger_cfg_node in tmp:
+                tmp = tmp[self.trigger_cfg_node]
+
+                if tmp and self.timer_trigger_node in tmp:
+                    self.timer_trigger_spec = self._clean_spec(
+                        tmp[self.timer_trigger_node]['spec'])
+                    # yes, there might be a existing node with nothing
+                    # defined
+                    if self.timer_trigger_spec:
+                        self.timer_trigger_based = True
+        except KeyError as e:
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
 
 
 class FreestyleJob(JenkinsJob):
