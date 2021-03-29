@@ -64,3 +64,4 @@
     <color>RED</color>
     <completeBuild>true</completeBuild>
   </runPostStepsIfResult>
+</maven2-moduleset>
