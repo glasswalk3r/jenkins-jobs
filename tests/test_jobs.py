@@ -128,31 +128,23 @@ https://plugins.jenkins.io/maven-plugin/'
     assert instance.timer_trigger_spec == 'H H 1,15 1-11 *'
 
 
-def test_mavenjob_instance_bogus():
-    config = xml_config('maven-job-plugin-bogus.xml')
-    job_name = 'maven job'
-
-    with pytest.raises(MissingXMLElementError) as excinfo:
-        MavenJob(job_name, config)
-
-    msg = f'Could not locate \'spec\' element while searching for a timer trigger in "{job_name}"'
-    assert msg == str(excinfo.value)
-
-
 def test_freestyle_class():
     assert issubclass(FreestyleJob, JenkinsJob)
     assert hasattr(FreestyleJob, 'root_node')
 
 
-def test_freestyle_instance_bogus():
-    job_name = 'freestyle job'
-    config = xml_config('freestyle-job-bogus.xml')
+@pytest.mark.parametrize('job_name, xml_filename, element, context, klass', [
+    ('maven job', 'maven-job-plugin-bogus.xml', 'spec', 'a timer trigger', MavenJob),
+    ('freestyle job', 'freestyle-job-bogus.xml', 'description', 'the job description', FreestyleJob)
+])
+def test_bogus_instance(job_name, xml_filename, element, context, klass):
+    config = xml_config(xml_filename)
 
     with pytest.raises(MissingXMLElementError) as excinfo:
-        FreestyleJob(job_name, config)
+        klass(job_name, config)
 
-    msg = f'Could not locate \'description\' element while searching for the job description in "{job_name}"'
-    assert msg == str(excinfo.value)
+    expected = f'Could not locate \'{element}\' element while searching for {context} in "{job_name}"'
+    assert str(excinfo.value) == expected
 
 
 def test_freestyle_instance():
