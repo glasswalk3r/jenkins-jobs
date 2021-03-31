@@ -1,4 +1,4 @@
-# jenkins-jobs
+# jenkins-jobs [![Travis](https://img.shields.io/travis/glasswalk3r/jenkins-jobs.svg)](https://travis-ci.org/glasswalk3r/jenkins-jobs/branches)
 
 Listing all jobs on a Jenkins server with more information than their respective
 names.
