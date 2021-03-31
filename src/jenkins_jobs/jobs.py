@@ -87,18 +87,23 @@ class PluginBasedJob(JenkinsJob):
     @staticmethod
     def _plugin_type(config):
         # <flow-definition plugin="workflow-job@2.36">
-        return next(iter(config['definition']))
+        try:
+            element = next(iter(config))
+        except StopIteration:
+            element = None
+
+        return element
 
     @staticmethod
     def plugin(config):
         plugin_type = PluginBasedJob._plugin_type(config)
-        plugin = config['definition'][plugin_type]['@plugin']
+        plugin = config[plugin_type]['@plugin']
         # plugin have their version include must of the times
         return plugin.split('@')[0].lower()
 
     def _find_desc(self, config):
         plugin_type = PluginBasedJob._plugin_type(config)
-        return config['definition'][plugin_type]['description']
+        return config[plugin_type]['description']
 
 
 class PipelineJob(PluginBasedJob):
@@ -108,7 +113,7 @@ TriggersJobProperty'
 
     def _find_timer_trigger(self, config):
         try:
-            tmp = config['definition'][self.root_node]['properties']
+            tmp = config[self.root_node]['properties']
 
             if self.trigger_grandparent_node in tmp:
                 tmp = tmp[self.trigger_grandparent_node]
@@ -133,7 +138,7 @@ class MavenJob(PluginBasedJob):
 
     def _find_timer_trigger(self, config):
         try:
-            tmp = config['definition'][self.root_node]
+            tmp = config[self.root_node]
 
             if self.trigger_parent_node in tmp:
                 tmp = tmp[self.trigger_parent_node]
@@ -154,7 +159,7 @@ class FreestyleJob(JenkinsJob):
 
     def _find_desc(self, config):
         try:
-            return config['definition'][self.root_node]['description']
+            return config[self.root_node]['description']
         except KeyError as e:
             raise MissingXMLElementError(element=str(e), job_name=self.name, context='the job description')
 
@@ -162,7 +167,7 @@ class FreestyleJob(JenkinsJob):
 
     def _find_timer_trigger(self, config):
         try:
-            tmp = config['definition'][self.root_node]['triggers']
+            tmp = config[self.root_node]['triggers']
 
             # tmp will be None if there is not trigger at all
             if tmp and self.timer_trigger_node in tmp:

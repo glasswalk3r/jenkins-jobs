@@ -47,9 +47,7 @@ def test_retriever_bogus_raises_exception(helpers):
 
 
 def test_retriever_invalid_raises_exception():
-    config = {}
-
     with pytest.raises(InvalidXMLConfigError) as excinfo:
-        Retriever._job_builder('Bogus Plugin sample', config)
+        Retriever._job_builder('Empty Plugin sample', {})
 
-    assert 'definition' in str(excinfo.value)
+    assert 'None' in str(excinfo.value)

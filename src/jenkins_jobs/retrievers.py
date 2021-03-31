@@ -23,7 +23,7 @@ class Retriever(ABC):
     def _job_builder(cls, name, config):
 
         try:
-            if 'project' in config['definition']:
+            if 'project' in config:
                 # not a plugin, because FreestyleJob doesn't use one
                 return FreestyleJob(name, config)
             else:
