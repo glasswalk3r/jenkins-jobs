@@ -8,7 +8,7 @@ import sys
 from jenkins_jobs.exceptions import NoSchemaSuppliedRESTError
 
 
-def main():
+def main():  # pragma: no cover
     parser = argparse.ArgumentParser(
         description='Exports Jenkins job information as Python shelve format')
     parser.add_argument('--user', required=True,

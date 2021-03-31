@@ -7,7 +7,7 @@ from jenkins_jobs.retrievers import RESTRetriever, FileSystemRetriever
 from jenkins_jobs.exceptions import NoSchemaSuppliedRESTError
 
 
-def main():
+def main():  # pragma: no cover
     """Console script for jenkins_jobs."""
     parser = argparse.ArgumentParser(
         description='Extracts Jenkins job information and generates a report')
