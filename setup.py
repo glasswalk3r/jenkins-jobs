@@ -36,6 +36,7 @@ setup(
     entry_points={
         'console_scripts': [
             'jenkins_jobs=jenkins_jobs.reporter:main',
+            'jenkins_exporter=jenkins_jobs.exporter:main'
         ],
     },
     install_requires=requirements,

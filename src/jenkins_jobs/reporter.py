@@ -1,4 +1,4 @@
-"""Console script for jenkins_jobs."""
+"""Console script for jenkins_jobs to report jobs at a Jenkins server."""
 import argparse
 import sys
 import os

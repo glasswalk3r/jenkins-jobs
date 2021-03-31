@@ -28,7 +28,7 @@ After the setup is complete, fire up the commands below:
 
 ```
 $ vagrant ssh
-$ java -jar jenkins-cli.jar -s http://localhost:8080/ -webSocket -auth admin:1124ffc2b50cf9f73f1a177254f8d57c9f list-jobs
+$ java -jar jenkins-cli.jar -s http://localhost:8080/ -webSocket -auth admin:116f3e55f677416a7c054faa20fbbcf0be list-jobs
 freestyle-sample
 pipeline-sample
 ```
