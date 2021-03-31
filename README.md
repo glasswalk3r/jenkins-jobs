@@ -3,77 +3,45 @@
 Listing all jobs on a Jenkins server with more information than their respective
 names.
 
-## Rationale
+## Features
 
-Some months ago I got three Jenkins servers with ~800 jobs included among them
-and the need to migrate those jobs to somewhere else.
+* Implements the `jenkins_jobs` CLI that allows the reporting of jobs in a
+Jenkins server.
+* The reports includes information of job name, job type, job description, if
+the job is executed through a schedule and the schedule itself.
+* Implements the `jenkins_exporter` CLI that allows the exporting of jobs
+information to a file in a
+[Shelve format](https://docs.python.org/3/library/shelve.html), which allows
+to export this information and use it locally for development or even with
+`jenkins_jobs` CLI.
 
-I will not discuss the reasons for such humongous amount, but anyway I would
-need to understand what those jobs were, how they were built and other details,
-so I could come up with a better strategy of migration.
+## Requirements
 
-For my surprise, nothing was available to use at that time.
+* Python 3, with version >= 3.6.
+* A Jenkins user and the related access token for authentication.
+* The Jenkins server URL.
 
-## Listing with Jenkins CLI
+## How to use
 
-First attempt was to use the official Jenkins CLI to extract that information.
-If you are curious, I included a `Vagrantfile` to start your own Jenkins server
-with zero configuration:
-
-```
-$ vagrant up
-```
-
-After the setup is complete, fire up the commands below:
-
-```
-$ vagrant ssh
-$ java -jar jenkins-cli.jar -s http://localhost:8080/ -webSocket -auth admin:116f3e55f677416a7c054faa20fbbcf0be list-jobs
-freestyle-sample
-pipeline-sample
-```
-
-Not very exciting output.
-
-So I tried the Jenkins
-[REST API](https://python-jenkins.readthedocs.io/en/latest/) with the
-`sample.py` Python 3 program:
+You can install this project module straight from [PyPi](https://pypi.org):
 
 ```
-$ cd /vagrant
-$ ./sample.py
-{'_class': 'hudson.model.FreeStyleProject', 'name': 'freestyle-sample', 'url': 'http://localhost:8080/job/freestyle-sample/', 'color': 'notbuilt', 'fullname': 'freestyle-sample'}
-XML information:
-OrderedDict([('project',
-              OrderedDict([('keepDependencies', 'false'),
-                           ('properties', None),
-                           ('scm',
-                            OrderedDict([('@class', 'hudson.scm.NullSCM')])),
-                           ('canRoam', 'false'),
-                           ('disabled', 'false'),
-                           ('blockBuildWhenDownstreamBuilding', 'false'),
-                           ('blockBuildWhenUpstreamBuilding', 'false'),
-                           ('triggers', None),
-                           ('concurrentBuild', 'false'),
-                           ('builders', None),
-                           ('publishers', None),
-                           ('buildWrappers', None)]))])
-{'_class': 'org.jenkinsci.plugins.workflow.job.WorkflowJob', 'name': 'pipeline-sample', 'url': 'http://localhost:8080/job/pipeline-sample/', 'color': 'notbuilt', 'fullname': 'pipeline-sample'}
-XML information:
-OrderedDict([('flow-definition',
-              OrderedDict([('@plugin', 'workflow-job@2.40'),
-                           ('keepDependencies', 'false'),
-                           ('properties', None),
-                           ('triggers', None),
-                           ('disabled', 'false')]))])
+pip install jenkins_jobs
 ```
 
-If you take in consideration this is almost raw output, it's an improvement
-because of the additional details, but far to be enough.
+Then just fire the `jenkins_job` CLI:
 
-## Refences
+```
+$ jenkins_jobs --user admin --token 116f3e55f677416a7c054faa20fbbcf0be --jenkins http://localhost:8080
+freestyle-sample|FreestyleJob|Sample freestyle job|True|H H 1,15 1-11 *
+Maven Sample|MavenJob|This is a sample Maven plugin based job, see https://plugins.jenkins.io/maven-plugin/|True|H H 1,15 1-11 *
+pipeline-sample|PipelineJob|This is a sample pipeline job|True|H/15 * * * *
+```
 
-* The [JenkinsAPI](https://jenkinsapi.readthedocs.io/en/latest/using_jenkinsapi.html) project.
-* The [python-jenkins](https://python-jenkins.readthedocs.io/en/latest/index.html) project.
-* Stackoverflow question: [Groovy to list all jobs](https://support.cloudbees.com/hc/en-us/articles/226941767-Groovy-to-list-all-jobs).
-* Stackoverflow question: [Determining the type of Jenkins project](https://stackoverflow.com/questions/45064038/determining-the-type-of-jenkins-project).
+You should be able to just import this output as a CSV with `|` (pipe) as the
+field separator. In future, different output formats might be provided.
+
+## More information
+
+Please refer to the module documentation (`README.rst`) for more details on this
+project.

@@ -15,6 +15,7 @@ Vagrant.configure('2') do |config|
     # vb.gui = true
     vb.memory = '2048'
     vb.cpus = '2'
+    vb.name = 'jenkins-sample'
   end
 
   config.vm.provision 'shell', inline: <<~SHELL
