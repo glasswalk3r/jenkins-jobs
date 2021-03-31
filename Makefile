@@ -50,7 +50,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 jenkins_jobs tests
+	flake8 src/jenkins_jobs tests
 
 test: ## run tests quickly with the default Python
 	pytest -v
