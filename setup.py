@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    description="Listing all jobs on a Jenkins server with more information than their respective",
+    description="Listing all jobs on a Jenkins server with more information than jenkins-cli.jar",
     entry_points={
         'console_scripts': [
             'jenkins_jobs=jenkins_jobs.reporter:main',
@@ -42,9 +42,10 @@ setup(
     license="GNU General Public License v3",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    keywords='jenkins_jobs',
+    keywords='jenkins jobs',
     name='jenkins_jobs',
-    packages=find_packages(include=['jenkins_jobs', 'jenkins_jobs.*']),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,

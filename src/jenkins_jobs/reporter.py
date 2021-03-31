@@ -3,7 +3,7 @@ import argparse
 import sys
 import os
 
-from retriever import RESTRetriever, FileSystemRetriever
+from jenkins_jobs.retrievers import RESTRetriever, FileSystemRetriever
 
 
 def main():
@@ -23,7 +23,9 @@ def main():
         jobs_retriever = RESTRetriever(user=args.user, token=args.token,
                                        jenkins_server=args.jenkins)
 
-    for job in jobs_retriever.all_jobs():
+    jobs = jobs_retriever.all_jobs()
+
+    for job in jobs():
         print(job)
 
 
