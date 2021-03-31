@@ -35,7 +35,7 @@ setup(
     description="Listing all jobs on a Jenkins server with more information than their respective",
     entry_points={
         'console_scripts': [
-            'jenkins_jobs=jenkins_jobs.cli:main',
+            'jenkins_jobs=jenkins_jobs.reporter:main',
         ],
     },
     install_requires=requirements,
