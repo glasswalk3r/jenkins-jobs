@@ -27,3 +27,24 @@ class InvalidXMLConfigError(JenkinsJobError):
 
     def __str__(self):
         return self.message
+
+
+class NoSchemaSuppliedRESTError(JenkinsJobError):
+    """Exception for Jenkins endpoints without a protocol schema.
+
+    This exception was created to be raised when validation of Jenkins endpoint URL occurs with any one of the CLIs that
+    are part of the module.
+
+    Otherwise, Jenkins will cause an exception with the HTTP client that is harder to understand:
+
+    requests.exceptions.MissingSchema: Invalid URL 'crumbIssuer/api/json': No schema supplied. Perhaps you meant
+    http://crumbIssuer/api/json?
+    """
+
+    def __init__(self):
+        """Configure the exception."""
+        self.message = 'No protocol schema (http:// or https://) supplied for Jenkins REST endpoint'
+
+    def __str__(self):
+        """Stringfy the exception."""
+        return self.message

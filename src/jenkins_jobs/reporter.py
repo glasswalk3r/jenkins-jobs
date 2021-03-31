@@ -4,6 +4,7 @@ import sys
 import os
 
 from jenkins_jobs.retrievers import RESTRetriever, FileSystemRetriever
+from jenkins_jobs.exceptions import NoSchemaSuppliedRESTError
 
 
 def main():
@@ -14,12 +15,16 @@ def main():
                         help='Jenkins user for REST interface')
     parser.add_argument('--token', required=True,
                         help='Jenkins token for REST interface')
-    parser.add_argument('--jenkins', help='Jenkins FQDN|IP:port', required=True)
+    parser.add_argument('--jenkins', help='Jenkins http[s]://FQDN|IP:port', required=True)
 
     if 'JOBS_REPORTER_DATA' in os.environ:
         jobs_retriever = FileSystemRetriever(os.environ['JOBS_REPORTER_DATA'])
     else:
         args = parser.parse_args()
+
+        if not args.jenkins.startswith('http'):
+            raise NoSchemaSuppliedRESTError
+
         jobs_retriever = RESTRetriever(user=args.user, token=args.token,
                                        jenkins_server=args.jenkins)
 
