@@ -76,8 +76,8 @@ def test_pluginbasedjob_instance_raises_exception(helpers):
     with pytest.raises(TypeError) as excinfo:
         PluginBasedJob('Workflow Job Plugin sample', config)
 
-    assert "Can't instantiate abstract class PluginBasedJob with abstract method _find_timer_trigger" == str(
-        excinfo.value)
+    assert str(excinfo.value).startswith("Can't instantiate abstract class PluginBasedJob")
+    assert '_find_timer_trigger' in str(excinfo.value)
 
 
 def test_pipelinejob_class():
