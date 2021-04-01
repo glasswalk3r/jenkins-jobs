@@ -43,5 +43,5 @@ field separator. In future, different output formats might be provided.
 
 ## More information
 
-Please refer to the module documentation (`README.rst`) for more details on this
-project.
+Please visit [readthedocs.io](https://jenkins-jobs.readthedocs.io/en/latest/)
+for more details on this project.
