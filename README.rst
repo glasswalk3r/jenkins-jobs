@@ -7,7 +7,7 @@ Jenkins Jobs
         :target: https://pypi.python.org/pypi/jenkins_jobs
 
 .. image:: https://img.shields.io/travis/glasswalk3r/jenkins_jobs.svg
-        :target: https://travis-ci.com/glasswalk3r/jenkins_jobs
+        :target: https://travis-ci.org/glasswalk3r/jenkins-jobs.svg?branch=main
 
 
 Listing all jobs on a Jenkins server with more information than their respective names.
@@ -56,6 +56,11 @@ If you are curious, you can use `Vagrant <https://www.vagrantup.com>`_ with the 
       vb.name = 'jenkins-sample'
   end
 
+These are the credentials already setup:
+
+* user: ``admin``
+* password: ``admin``
+* token: ``116f3e55f677416a7c054faa20fbbcf0be``
 
 Finally, fire up the VM:
 
