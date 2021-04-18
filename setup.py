@@ -49,7 +49,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/glasswalk3r/jenkins_jobs',
+    url='https://github.com/glasswalk3r/jenkins-jobs',
     version='0.0.1',
     zip_safe=False,
 )
