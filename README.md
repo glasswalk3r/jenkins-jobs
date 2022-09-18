@@ -1,4 +1,6 @@
-# jenkins-jobs [![TravisCI](https://img.shields.io/travis/glasswalk3r/jenkins-jobs.svg)](https://travis-ci.org/glasswalk3r/jenkins-jobs.svg?branch=main) [![Documentation Status](https://readthedocs.org/projects/jenkins-jobs/badge/?version=latest)](https://jenkins-jobs.readthedocs.io/en/latest/?badge=latest)
+# jenkins-jobs
+
+[![Python application](https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml/badge.svg)](https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml)
 
 Listing all jobs on a Jenkins server with more information than their respective
 names.
