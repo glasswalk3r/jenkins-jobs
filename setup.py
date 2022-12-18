@@ -18,7 +18,7 @@ test_requirements = ['pytest>=3', ]
 
 setup(
     author="Alceu Rodrigues de Freitas Junior",
-    author_email='glasswalk3r@yahoo.com.br',
+    author_email='arfreitas@cpan.org',
     python_requires='>=3.5',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
@@ -26,12 +26,13 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
-    description="Listing all jobs on a Jenkins server with more information than jenkins-cli.jar",
+    description="Listing all jobs on a Jenkins server with more information \
+than jenkins-cli.jar",
     entry_points={
         'console_scripts': [
             'jenkins_jobs=jenkins_jobs.reporter:main',
