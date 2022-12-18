@@ -6,9 +6,8 @@ Jenkins Jobs
 .. image:: https://img.shields.io/pypi/v/jenkins_jobs.svg
         :target: https://pypi.python.org/pypi/jenkins_jobs
 
-.. image:: https://img.shields.io/travis/glasswalk3r/jenkins_jobs.svg
-        :target: https://travis-ci.org/glasswalk3r/jenkins-jobs.svg?branch=main
-
+.. image:: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml/badge.svg
+        :target: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml
 
 Listing all jobs on a Jenkins server with more information than their respective names.
 
