@@ -1,7 +1,8 @@
-include config.mk
 VIRTUALENV:=$(shell basename $$PWD)
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
+
+SPHINX_APIDOC_OPTIONS:=members,undoc-members,show-inheritance,private-members,special-members
 
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -67,7 +68,7 @@ coverage: ## check code coverage quickly with the default Python
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/jenkins_jobs.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ src/jenkins_jobs
+	sphinx-apidoc --ext-autodoc -o docs/ src/jenkins_jobs
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
