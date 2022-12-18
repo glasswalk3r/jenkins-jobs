@@ -13,7 +13,7 @@ class TimerTriggerResult():
     """Representation of a timer trigger search.
 
     A instance of this class must be returned by implementations of the
-    abstract method JenkinsJob._find_timer_trigger.
+    abstract method ``JenkinsJob._find_timer_trigger()``.
     """
 
     def __init__(self, trigger_based, spec):

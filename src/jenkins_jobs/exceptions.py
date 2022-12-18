@@ -6,7 +6,7 @@ class JenkinsJobError(Exception):
 
 
 class InvalidFindTimerTriggerError(JenkinsJobError):
-    """Describe a invalid return from the _find_timer_trigger method."""
+    """Describe a invalid return from the ``_find_timer_trigger()`` method."""
 
     def __init__(self, original):
         """Configure the instance.
@@ -88,8 +88,8 @@ class NoSchemaSuppliedRESTError(JenkinsJobError):
     Otherwise, Jenkins will cause an exception with the HTTP client that is
     harder to understand:
 
-    requests.exceptions.MissingSchema: Invalid URL 'crumbIssuer/api/json':
-    No schema supplied. Perhaps you meant http://crumbIssuer/api/json?
+    ``requests.exceptions.MissingSchema: Invalid URL 'crumbIssuer/api/json':
+    No schema supplied. Perhaps you meant http://crumbIssuer/api/json?``
     """
 
     def __init__(self):
