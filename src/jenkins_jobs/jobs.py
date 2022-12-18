@@ -143,6 +143,11 @@ class JenkinsJob(ABC):
         return '\n'.join(clean_lines)
 
     def __str__(self):
+        """String representation of the instance.
+
+        :return: a CSV string, using the pipe ("|") character as separator.
+        :rtype: str
+        """
         if self.timer_trigger_based:
             return '|'.join([
                 self.name,
@@ -162,11 +167,19 @@ class JenkinsJob(ABC):
 
 
 class PluginBasedJob(JenkinsJob):
-    """Representation of Jenkins jobs that are based on plugins."""
+    """Representation of a Jenkins job that is based on a plugin."""
     root_node = None
 
     @staticmethod
     def _plugin_type(config):
+        """Find the plugin type XML node by iterating over the job
+        configuration.
+
+        :param: dict config: the job configuration
+
+        :return: the name of the plugin type
+        :rtype: str
+        """
         # <flow-definition plugin="workflow-job@2.36">
         try:
             element = next(iter(config))
@@ -177,12 +190,20 @@ class PluginBasedJob(JenkinsJob):
 
     @staticmethod
     def plugin(config):
+        """Retrieve the plugin type name.
+
+        :param: dict config: the job configuration
+
+        :return: the plugin type name, without version information
+        :rtype: str
+        """
         plugin_type = PluginBasedJob._plugin_type(config)
         plugin = config[plugin_type]['@plugin']
-        # plugin have their version include must of the times
+        # plugin have their version include most of the times
         return plugin.split('@')[0].lower()
 
     def _find_desc(self, config):
+        """Implement parent class abstract method."""
         description = None
         plugin_type = PluginBasedJob._plugin_type(config)
         description = config[plugin_type]['description']
@@ -194,11 +215,14 @@ class PluginBasedJob(JenkinsJob):
 
 
 class PipelineJob(PluginBasedJob):
+    """A job that is based on a Pipeline plugin."""
+
     root_node = 'flow-definition'
     trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.\
 PipelineTriggersJobProperty'
 
     def _find_timer_trigger(self, config):
+        """Implement parent class abstract method."""
         result = None
         try:
             tmp = config[self.root_node]['properties']
@@ -229,10 +253,13 @@ PipelineTriggersJobProperty'
 
 
 class MavenJob(PluginBasedJob):
+    """A job that is based on a Maven plugin."""
+
     root_node = 'maven2-moduleset'
     trigger_parent_node = 'triggers'
 
     def _find_timer_trigger(self, config):
+        """Implement parent class abstract method."""
         result = None
 
         try:
@@ -261,9 +288,12 @@ class MavenJob(PluginBasedJob):
 
 
 class FreestyleJob(JenkinsJob):
+    """A free style job."""
+
     root_node = 'project'
 
     def _find_desc(self, config):
+        """Implement parent class abstract method."""
         description = None
 
         try:
@@ -278,6 +308,7 @@ class FreestyleJob(JenkinsJob):
         return description
 
     def _find_timer_trigger(self, config):
+        """Implement parent class abstract method."""
         result = None
 
         try:
