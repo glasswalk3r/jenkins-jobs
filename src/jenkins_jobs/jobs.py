@@ -215,7 +215,7 @@ class PluginBasedJob(JenkinsJob):
 
 
 class PipelineJob(PluginBasedJob):
-    """A job that is based on a Pipeline plugin."""
+    """A job that is based on the Pipeline plugin."""
 
     root_node = 'flow-definition'
     trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.\
@@ -253,7 +253,7 @@ PipelineTriggersJobProperty'
 
 
 class MavenJob(PluginBasedJob):
-    """A job that is based on a Maven plugin."""
+    """A job that is based on the Maven plugin."""
 
     root_node = 'maven2-moduleset'
     trigger_parent_node = 'triggers'

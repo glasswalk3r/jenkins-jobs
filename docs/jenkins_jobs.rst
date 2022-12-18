@@ -11,8 +11,6 @@ jenkins\_jobs.exceptions module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
 
 jenkins\_jobs.exporter module
 -----------------------------
@@ -21,8 +19,6 @@ jenkins\_jobs.exporter module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
 
 jenkins\_jobs.jobs module
 -------------------------
@@ -31,8 +27,6 @@ jenkins\_jobs.jobs module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
 
 jenkins\_jobs.reporter module
 -----------------------------
@@ -41,8 +35,6 @@ jenkins\_jobs.reporter module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
 
 jenkins\_jobs.retrievers module
 -------------------------------
@@ -51,8 +43,6 @@ jenkins\_jobs.retrievers module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
 
 Module contents
 ---------------
@@ -61,5 +51,3 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-   :special-members:
