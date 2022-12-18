@@ -1,4 +1,6 @@
-"""Console script for jenkins_jobs to export jobs configuration from a Jenkins server."""
+"""Command line interface (CLI) for jenkins_jobs to export jobs configuration
+from a Jenkins server."""
+
 import jenkins
 import shelve
 import xmltodict
@@ -9,13 +11,17 @@ from jenkins_jobs.exceptions import NoSchemaSuppliedRESTError
 
 
 def main():  # pragma: no cover
+    """Parses command line options and exports the jobs based on that
+    configuration."""
+
     parser = argparse.ArgumentParser(
         description='Exports Jenkins job information as Python shelve format')
     parser.add_argument('--user', required=True,
                         help='Jenkins user for REST interface')
     parser.add_argument('--token', required=True,
                         help='Jenkins token for REST interface')
-    parser.add_argument('--jenkins', help='Jenkins http[s]://FQDN|IP:port', required=True)
+    parser.add_argument('--jenkins', help='Jenkins http[s]://FQDN|IP:port',
+                        required=True)
     args = parser.parse_args()
 
     if not args.jenkins.startswith('http'):

@@ -15,7 +15,8 @@ def main():  # pragma: no cover
                         help='Jenkins user for REST interface')
     parser.add_argument('--token', required=True,
                         help='Jenkins token for REST interface')
-    parser.add_argument('--jenkins', help='Jenkins http[s]://FQDN|IP:port', required=True)
+    parser.add_argument('--jenkins', help='Jenkins http[s]://FQDN|IP:port',
+                        required=True)
 
     if 'JOBS_REPORTER_DATA' in os.environ:
         jobs_retriever = FileSystemRetriever(os.environ['JOBS_REPORTER_DATA'])
