@@ -101,13 +101,16 @@ def test_pipelinejob_instance(helpers):
     assert instance.root_node == 'flow-definition'
     assert instance.description == 'Sample description for PipelineJob'
     assert instance.timer_trigger_based is False
+    assert instance.timer_trigger_spec is None
 
 
 def test_pipelinejob_instance_scheduler(helpers):
     config = helpers.xml_config('workflow-job-plugin-timer.xml')
     instance = PipelineJob('Workflow Job Plugin sample', config)
     assert instance.root_node == 'flow-definition'
-    assert instance.description == 'This is a sample pipeline job with timer trigger'
+    assert instance.description == 'This is a sample pipeline job with timer \
+trigger'
+
     assert instance.timer_trigger_based is True
     assert instance.timer_trigger_spec == 'H/15 * * * *'
 

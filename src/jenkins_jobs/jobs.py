@@ -3,26 +3,93 @@
 from collections import deque
 from abc import ABC, abstractmethod
 
-from jenkins_jobs.exceptions import MissingXMLElementError
+from jenkins_jobs.exceptions import (
+        MissingXMLElementError,
+        InvalidFindTimerTriggerError
+)
+
+
+class TimerTriggerResult():
+    """Representation of a timer trigger search.
+
+    A instance of this class must be returned by implementations of the
+    abstract method JenkinsJob._find_timer_trigger.
+    """
+
+    def __init__(self, trigger_based, spec):
+        """Initialize a instance.
+
+        :param bool trigger_based: if the job is trigger based or not
+        :param str spec: the trigger specification
+
+        :return nothing
+        :rtype None
+        """
+        self._in_use = trigger_based
+        self._spec = spec
+
+    def trigger_spec(self):
+        """Get the timer trigger specification, as a crontab string.
+
+        :return: the crontab string, or None
+        :rtype: str
+        """
+        return self._spec
+
+    def is_defined(self):
+        """Get if the job is timer trigger based or not.
+
+        :return: True or False
+        :rtype: bool
+        """
+        return self._in_use
 
 
 class JenkinsJob(ABC):
+    """Base class for all expected Jenkins job types."""
+
     timer_trigger_node = 'hudson.triggers.TimerTrigger'
 
     def __init__(self, name, config):
+        """Initialize the instance.
+
+        :param str name: the name of the job
+        :param dict config: the job configuration
+
+        :return: nothing
+        :rtype: None
+        """
         self.name = name
-        self.timer_trigger_based = False
-        self.timer_trigger_spec = None
         self._onliner(config)
         self._find_desc(config)
-        self._find_timer_trigger(config)
+        result = self._find_timer_trigger(config)
+
+        try:
+            self.timer_trigger_based = result.is_defined()
+            self.timer_trigger_spec = result.trigger_spec()
+        except Exception as e:
+            raise InvalidFindTimerTriggerError(str(e))
 
     @abstractmethod
     def _find_desc(self, config):
+        """Find the job description.
+
+        :param dict config: the job configuration
+
+        :return: the job description
+        :rtype: str
+        """
         pass  # pragma: no cover
 
     @abstractmethod
     def _find_timer_trigger(self, config):
+        """Search for a timer trigger and set the instance.
+
+        :param dict config: the job configuration
+
+        :return: an instance of TimerTriggerResult
+        :rtype: TimerTriggerResult
+        """
         pass  # pragma: no cover
 
     def _onliner(self, config):
@@ -108,10 +175,11 @@ class PluginBasedJob(JenkinsJob):
 
 class PipelineJob(PluginBasedJob):
     root_node = 'flow-definition'
-    trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.Pipeline\
-TriggersJobProperty'
+    trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.\
+PipelineTriggersJobProperty'
 
     def _find_timer_trigger(self, config):
+        result = None
         try:
             tmp = config[self.root_node]['properties']
 
@@ -122,14 +190,22 @@ TriggersJobProperty'
                     tmp = tmp['triggers']
 
                     if tmp and self.timer_trigger_node in tmp:
-                        self.timer_trigger_spec = self._clean_spec(
-                            tmp[self.timer_trigger_node]['spec'])
+                        spec = self._clean_spec(
+                                tmp[self.timer_trigger_node]['spec'])
                         # yes, there might be a existing node with nothing
                         # defined
-                        if self.timer_trigger_spec:
-                            self.timer_trigger_based = True
+                        if spec:
+                            result = TimerTriggerResult(True, spec)
+                        else:
+                            result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name,
+                                         context='a timer trigger')
+
+        if result is None:
+            result = TimerTriggerResult(False, None)
+
+        return result
 
 
 class MavenJob(PluginBasedJob):
@@ -137,6 +213,8 @@ class MavenJob(PluginBasedJob):
     trigger_parent_node = 'triggers'
 
     def _find_timer_trigger(self, config):
+        result = None
+
         try:
             tmp = config[self.root_node]
 
@@ -144,14 +222,22 @@ class MavenJob(PluginBasedJob):
                 tmp = tmp[self.trigger_parent_node]
 
                 if tmp and self.timer_trigger_node in tmp:
-                    self.timer_trigger_spec = self._clean_spec(
-                        tmp[self.timer_trigger_node]['spec'])
+                    spec = self._clean_spec(
+                            tmp[self.timer_trigger_node]['spec'])
                     # yes, there might be a existing node with nothing
                     # defined
-                    if self.timer_trigger_spec:
-                        self.timer_trigger_based = True
+                    if spec:
+                        result = TimerTriggerResult(True, spec)
+                    else:
+                        result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name,
+                                         context='a timer trigger')
+
+        if result is None:
+            result = TimerTriggerResult(False, None)
+
+        return result
 
 
 class FreestyleJob(JenkinsJob):
@@ -161,20 +247,31 @@ class FreestyleJob(JenkinsJob):
         try:
             return config[self.root_node]['description']
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name, context='the job description')
+            raise MissingXMLElementError(element=str(e), job_name=self.name,
+                                         context='the job description')
 
         return None
 
     def _find_timer_trigger(self, config):
+        result = None
+
         try:
             tmp = config[self.root_node]['triggers']
 
             # tmp will be None if there is not trigger at all
             if tmp and self.timer_trigger_node in tmp:
-                self.timer_trigger_spec = self._clean_spec(
-                    tmp[self.timer_trigger_node]['spec'])
+                spec = self._clean_spec(
+                        tmp[self.timer_trigger_node]['spec'])
                 # yes, there might be a existing node with nothing defined
-                if self.timer_trigger_spec:
-                    self.timer_trigger_based = True
+                if spec:
+                    result = TimerTriggerResult(True, spec)
+                else:
+                    result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name, context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name,
+                                         context='a timer trigger')
+
+        if result is None:
+            result = TimerTriggerResult(False, None)
+
+        return result
