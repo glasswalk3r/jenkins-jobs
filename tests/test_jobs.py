@@ -24,7 +24,7 @@ methods _find_desc, _find_timer_trigger"
 
 
 def test_jenkinsjob_methods():
-    methods = ('__init__', '_find_desc', '_find_timer_trigger', '_onliner',
+    methods = ('__init__', '_find_desc', '_find_timer_trigger', 'one_line_desc',
                '_clean_spec', '__str__')
 
     for method in methods:

@@ -49,6 +49,7 @@ class JenkinsJob(ABC):
     """Base class for all expected Jenkins job types."""
 
     timer_trigger_node = 'hudson.triggers.TimerTrigger'
+    default_miss_desc = '*** MISSING DESCRIPTION ***'
 
     def __init__(self, name, config):
         """Initialize the instance.
@@ -60,8 +61,7 @@ class JenkinsJob(ABC):
         :rtype: None
         """
         self.name = name
-        self._onliner(config)
-        self._find_desc(config)
+        self.description = self._find_desc(config)
         result = self._find_timer_trigger(config)
 
         try:
@@ -92,26 +92,39 @@ class JenkinsJob(ABC):
         """
         pass  # pragma: no cover
 
-    def _onliner(self, config):
-        description = self._find_desc(config)
+    def one_line_desc(self):
+        """Generate a single line string from the job description.
 
-        if description:
-            description = description.replace('\r\n', '\n')
-            lines = description.lstrip().rstrip().split('\n')
-            new_lines = deque()
+        No parameter is required or expected.
 
-            for line in lines:
-                if line == '':
-                    continue
+        :return: the one line description
+        :rtype: str
+        """
+        description = self.description
+        description = description.replace('\r\n', '\n')
+        lines = description.lstrip().rstrip().split('\n')
+        new_lines = deque()
 
-                new_lines.append(line)
+        for line in lines:
+            if line == '':
+                continue
 
-            self.description = ' '.join(new_lines)
-        else:
-            self.description = '*** MISSING DESCRIPTION ***'
+            new_lines.append(line)
+
+        result = ' '.join(new_lines)
+
+        return result
 
     @staticmethod
     def _clean_spec(timer_spec):
+        """Remove unwanted characters that might be part of the timer trigger
+        specification.
+
+        :param str timer_spec: the timer trigger specification
+
+        :return: the cleaned timer trigger specification
+        :rtype: str
+        """
         spec = None
 
         if timer_spec is None:
@@ -134,7 +147,7 @@ class JenkinsJob(ABC):
             return '|'.join([
                 self.name,
                 self.__class__.__name__,
-                self.description,
+                self.one_line_desc(),
                 str(self.timer_trigger_based),
                 self.timer_trigger_spec
             ])
@@ -142,13 +155,14 @@ class JenkinsJob(ABC):
             return '|'.join([
                 self.name,
                 self.__class__.__name__,
-                self.description,
+                self.one_line_desc(),
                 str(self.timer_trigger_based),
                 'not applicable'
             ])
 
 
 class PluginBasedJob(JenkinsJob):
+    """Representation of Jenkins jobs that are based on plugins."""
     root_node = None
 
     @staticmethod
@@ -169,8 +183,14 @@ class PluginBasedJob(JenkinsJob):
         return plugin.split('@')[0].lower()
 
     def _find_desc(self, config):
+        description = None
         plugin_type = PluginBasedJob._plugin_type(config)
-        return config[plugin_type]['description']
+        description = config[plugin_type]['description']
+
+        if description is None:
+            description = self.default_miss_desc
+
+        return description
 
 
 class PipelineJob(PluginBasedJob):
@@ -244,13 +264,18 @@ class FreestyleJob(JenkinsJob):
     root_node = 'project'
 
     def _find_desc(self, config):
+        description = None
+
         try:
-            return config[self.root_node]['description']
+            description = config[self.root_node]['description']
         except KeyError as e:
             raise MissingXMLElementError(element=str(e), job_name=self.name,
                                          context='the job description')
 
-        return None
+        if description is None:
+            return self.default_miss_desc
+
+        return description
 
     def _find_timer_trigger(self, config):
         result = None
