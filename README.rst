@@ -6,11 +6,11 @@ Jenkins Jobs
 .. image:: https://img.shields.io/pypi/v/jenkins_jobs.svg
         :target: https://pypi.python.org/pypi/jenkins_jobs
 
-.. image:: https://img.shields.io/travis/glasswalk3r/jenkins_jobs.svg
-        :target: https://travis-ci.org/glasswalk3r/jenkins-jobs.svg?branch=main
+.. image:: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml/badge.svg
+        :target: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml
 
-
-Listing all jobs on a Jenkins server with more information than their respective names.
+Listing all jobs on a Jenkins server with more information than their
+respective names.
 
 
 * Free software: GNU General Public License v3
@@ -19,15 +19,20 @@ Listing all jobs on a Jenkins server with more information than their respective
 Features
 --------
 
-* Implements the `jenkins_jobs` CLI that allows the reporting of jobs in a Jenkins server.
-* The reports includes information of job name, job type, job description, if the job is executed through a schedule and the schedule itself.
-* Implements the `jenkins_exporter` CLI that allows the exporting of jobs information to a file in a `Shelve format <https://docs.python.org/3/library/shelve.html>`_, which allows to export this information and use it locally for development or even with `jenkins_jobs` CLI.
+* Implements the `jenkins_jobs` CLI that allows the reporting of jobs in a
+  Jenkins server.
+* The reports includes information of job name, job type, job description, if
+  the job is executed through a schedule and the schedule itself.
+* Implements the `jenkins_exporter` CLI that allows the exporting of jobs
+  information to a file in a `Shelve format <https://docs.python.org/3/library/shelve.html>`_,
+  which allows to export this information and use it locally for development or
+  even with `jenkins_jobs` CLI.
 
 Rationale
 ---------
 
-Some months ago I got three Jenkins servers about 800 jobs included among them
-and the need to migrate those jobs to somewhere else.
+Some time ago I got to migrate jobs from three Jenkins servers with about 800
+jobs included among them and the need to migrate those jobs to somewhere else.
 
 I will not discuss the reasons for such humongous amount, but anyway I would
 need to understand what those jobs were, how they were built and other details,
@@ -38,9 +43,12 @@ For my surprise, nothing was available to use at that time.
 Listing with Jenkins CLI
 ========================
 
-My first attempt was to use the official Jenkins CLI to extract that information.
+My first attempt was to use the official Jenkins CLI to extract that
+information.
 
-If you are curious, you can use `Vagrant <https://www.vagrantup.com>`_ with the following ``Vagrantfile`` and download the Vagrant box I created with a sample Jenkins server and some examples jobs over there:
+If you are curious, you can use `Vagrant <https://www.vagrantup.com>`_ with the
+following ``Vagrantfile`` and download the Vagrant box I created with a sample
+Jenkins server and some examples jobs over there:
 
 ::
 
@@ -118,11 +126,14 @@ So then I tried the Jenkins `REST API <https://python-jenkins.readthedocs.io/en/
 
 
 If you take in consideration this is almost raw output, it's an improvement
-because of the additional details, but far to be enough.
+because of the additional details, but far from enough.
 
-First because part of the output is XML. Second, it is not exactly easy to understand the output.
+First because part of the output is XML. Second, it is not exactly easy to
+understand the output.
 
-Worst, the XML specification depends on the job underline mechanism: if the job is based on a plugin, the XML format will depend on that plugin, not on Jenkins.
+Worst, the XML specification depends on the job underline mechanism: if the
+job is based on a plugin, the XML format will depend on that plugin, not on
+Jenkins.
 
 Getting documentation about the XML format is another challenge.
 
