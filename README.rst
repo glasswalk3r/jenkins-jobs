@@ -26,7 +26,7 @@ Features
 * Implements the ``jenkins_exporter`` CLI that allows the exporting of jobs
   information to a file in a `Shelve format <https://docs.python.org/3/library/shelve.html>`_,
   which allows to export this information and use it locally for development or
-  even with `jenkins_jobs` CLI.
+  even with ``jenkins_jobs`` CLI.
 
 Rationale
 ---------
