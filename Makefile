@@ -87,11 +87,11 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
-config:
+init:
 	pyenv virtualenv $(VIRTUALENV)
 	pyenv local $(VIRTUALENV)
-	pip install --upgrade pip wheel
-	pip install -r requirements_dev.txt
+	pip install --upgrade pip wheel setuptools
+	pip install -r requirements-dev.txt
 
 debug:
 	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar

@@ -9,7 +9,7 @@ Jenkins Jobs
 .. image:: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml/badge.svg
         :target: https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml
 
-Listing all jobs on a Jenkins server with more information than their
+Listing all jobs on a Jenkins server with more information than just their
 respective names.
 
 
@@ -19,14 +19,14 @@ respective names.
 Features
 --------
 
-* Implements the `jenkins_jobs` CLI that allows the reporting of jobs in a
+* Implements the ``jenkins_jobs`` CLI that allows the reporting of jobs in a
   Jenkins server.
 * The reports includes information of job name, job type, job description, if
   the job is executed through a schedule and the schedule itself.
-* Implements the `jenkins_exporter` CLI that allows the exporting of jobs
+* Implements the ``jenkins_exporter`` CLI that allows the exporting of jobs
   information to a file in a `Shelve format <https://docs.python.org/3/library/shelve.html>`_,
   which allows to export this information and use it locally for development or
-  even with `jenkins_jobs` CLI.
+  even with ``jenkins_jobs`` CLI.
 
 Rationale
 ---------
@@ -38,7 +38,7 @@ I will not discuss the reasons for such humongous amount, but anyway I would
 need to understand what those jobs were, how they were built and other details,
 so I could come up with a better strategy of migration.
 
-For my surprise, nothing was available to use at that time.
+For my surprise, no tooling was available to use at that time.
 
 Listing with Jenkins CLI
 ========================
@@ -46,9 +46,9 @@ Listing with Jenkins CLI
 My first attempt was to use the official Jenkins CLI to extract that
 information.
 
-If you are curious, you can use `Vagrant <https://www.vagrantup.com>`_ with the
-following ``Vagrantfile`` and download the Vagrant box I created with a sample
-Jenkins server and some examples jobs over there:
+If you are curious, you can use `Vagrant <https://www.vagrantup.com>`_ with
+the following ``Vagrantfile`` and download the Vagrant VirtualBox box I
+created with a sample Jenkins server and some examples jobs over there:
 
 ::
 
@@ -66,9 +66,9 @@ Jenkins server and some examples jobs over there:
 
 These are the credentials already setup:
 
-* user: ``admin``
-* password: ``admin``
-* token: ``116f3e55f677416a7c054faa20fbbcf0be``
+* user: admin
+* password: admin
+* token: 116f3e55f677416a7c054faa20fbbcf0be
 
 Finally, fire up the VM:
 
@@ -92,7 +92,8 @@ Not a very exciting output. You will get the job names and that's it.
 Listing with the REST API
 =========================
 
-So then I tried the Jenkins `REST API <https://python-jenkins.readthedocs.io/en/latest/>`_ with the ``sample.py`` Python 3 program:
+So then I tried the Jenkins
+`REST API <https://python-jenkins.readthedocs.io/en/latest/>`_ with the ``sample.py`` Python 3 program:
 
 ::
 
@@ -143,7 +144,6 @@ Solution
 What the jenkins-jobs project tries to do is to map desired information from
 the XML format based on the Python classes under ``jenkins_jobs.jobs`` module.
 
-
 References
 ----------
 
@@ -151,7 +151,6 @@ References
 * The `python-jenkins <https://python-jenkins.readthedocs.io/en/latest/index.html>`_ project.
 * Stackoverflow question: `Groovy to list all jobs <https://support.cloudbees.com/hc/en-us/articles/226941767-Groovy-to-list-all-jobs>`_.
 * Stackoverflow question: `Determining the type of Jenkins project <https://stackoverflow.com/questions/45064038/determining-the-type-of-jenkins-project>`_.
-
 
 Credits
 -------

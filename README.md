@@ -19,7 +19,7 @@ to export this information and use it locally for development or even with
 
 ## Requirements
 
-* Python 3, with version >= 3.6.
+* Python 3, with version >= 3.8.
 * A Jenkins user and the related access token for authentication.
 * The Jenkins server URL.
 
