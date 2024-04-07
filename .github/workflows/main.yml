@@ -1,18 +1,16 @@
 ---
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see:
-# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Python application
 
 on:  # yamllint disable-line rule:truthy
   push:
     paths-ignore:
-      - README.md
+      - '*.md'
+      - '*.rst'
       - Makefile
-    branches: ["main"]
+      - sample.py
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -23,12 +21,11 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Set up Python ${{ matrix.python-version }}'
         uses: actions/setup-python@v4
         with:
@@ -48,6 +45,6 @@ jobs:
         run: |
           pytest
       - name: Searchs for know vulnerabities
-        uses: pypa/gh-action-pip-audit@v1.0.0
+        uses: pypa/gh-action-pip-audit@v1.0.8
         with:
           inputs: requirements.txt
