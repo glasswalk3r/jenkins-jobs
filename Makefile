@@ -101,3 +101,6 @@ run:
 
 local:
 	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python jobs_reporter.py --user foobar --token foobar --jenkins foobar
+bump:
+	bump2version --tag patch
+
