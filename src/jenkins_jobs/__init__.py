@@ -2,4 +2,4 @@
 
 __author__ = """Alceu Rodrigues de Freitas Junior"""
 __email__ = 'glasswalk3r@yahoo.com.br'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
