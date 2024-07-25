@@ -2,14 +2,13 @@
 
 [![Python application](https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml/badge.svg)](https://github.com/glasswalk3r/jenkins-jobs/actions/workflows/main.yml)
 
-Listing all jobs on a Jenkins server with more information than their respective
-names.
+A CLI programa that lists all jobs on a Jenkins server with more information
+than their respective names.
 
 ## Features
 
 * Implements the `jenkins_jobs` CLI that allows the reporting of jobs in a
-Jenkins server.
-* The reports includes information of job name, job type, job description, if
+Jenkins server. The reports includes information of job name, job type, job description, if
 the job is executed through a schedule and the schedule itself.
 * Implements the `jenkins_exporter` CLI that allows the exporting of jobs
 information to a file in a
