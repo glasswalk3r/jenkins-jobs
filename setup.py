@@ -51,6 +51,6 @@ than jenkins-cli.jar",
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/glasswalk3r/jenkins-jobs',
-    version='0.1.5',
+    version='0.1.6',
     zip_safe=False,
 )
