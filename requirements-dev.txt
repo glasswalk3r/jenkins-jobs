@@ -5,5 +5,5 @@ coverage==7.6.1
 flake8==7.1.1
 pytest==8.3.3
 Sphinx==8.0.2
-tox==4.20.0
+tox==4.21.2
 twine==5.1.1
