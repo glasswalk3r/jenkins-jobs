@@ -4,53 +4,59 @@
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
+with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
+with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = ['python-jenkins>=1.7.0', 'xmltodict>=0.12.0']
+requirements = ["python-jenkins>=1.7.0", "xmltodict>=0.12.0"]
 
-setup_requirements = ['pytest-runner', ]
+setup_requirements = [
+    "pytest-runner",
+]
 
-test_requirements = ['pytest>=3', ]
+test_requirements = [
+    "pytest>=3",
+]
 
 setup(
     author="Alceu Rodrigues de Freitas Junior",
-    author_email='arfreitas@cpan.org',
-    python_requires='>=3.8',
+    author_email="glasswalk3r@yahoo.com.br",
+    python_requires=">=3.8",
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
     description="Listing all jobs on a Jenkins server with more information \
 than jenkins-cli.jar",
     entry_points={
-        'console_scripts': [
-            'jenkins_jobs=jenkins_jobs.reporter:main',
-            'jenkins_exporter=jenkins_jobs.exporter:main'
+        "console_scripts": [
+            "jenkins_jobs=jenkins_jobs.reporter:main",
+            "jenkins_exporter=jenkins_jobs.exporter:main",
         ],
     },
     install_requires=requirements,
     license="GNU General Public License v3",
-    long_description=readme + '\n\n' + history,
+    long_description=readme + "\n\n" + history,
     include_package_data=True,
-    keywords='jenkins jobs',
-    name='jenkins_jobs',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
+    keywords="jenkins jobs",
+    name="jenkins_jobs",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     setup_requires=setup_requirements,
-    test_suite='tests',
+    test_suite="tests",
     tests_require=test_requirements,
-    url='https://github.com/glasswalk3r/jenkins-jobs',
-    version='0.1.6',
+    url="https://github.com/glasswalk3r/jenkins-jobs",
+    version="0.1.6",
     zip_safe=False,
 )
