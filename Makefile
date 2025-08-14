@@ -35,14 +35,14 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
-	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
+	find . -name '*.egg-info' | xargs rm -rf
+	find . -name '*.egg' | xargs rm -rf
 
 clean-pyc: ## remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
+	find . -name '*.pyc' | xargs rm -rf
+	find . -name '*.pyo' | xargs rm -rf
+	find . -name '*~' | xargs rm -rf
+	find . -name '__pycache__' | xargs rm -rf
 
 clean-test: ## remove test and coverage artifacts
 	rm -fr .tox/
@@ -57,7 +57,7 @@ test: ## run tests quickly with the default Python
 	pytest -v
 
 test-all: ## run tests on every Python version with tox
-	tox
+	python -m tox
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source jenkins_jobs -m pytest
@@ -90,8 +90,10 @@ install: clean ## install the package to the active Python's site-packages
 init:
 	pyenv virtualenv $(VIRTUALENV)
 	pyenv local $(VIRTUALENV)
-	pip install --upgrade pip wheel setuptools
-	pip install -r requirements-dev.txt
+	python -m pip install --upgrade pip wheel setuptools
+
+update-deps:
+	python -m pip install --use-pep517 --no-build-isolation -r requirements-dev.txt
 
 debug:
 	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar

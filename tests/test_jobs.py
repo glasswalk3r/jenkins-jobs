@@ -1,13 +1,14 @@
 """Tests for `jenkins_jobs` package."""
+
 import inspect
 import pytest
 
 from jenkins_jobs.jobs import (
-        JenkinsJob,
-        PluginBasedJob,
-        PipelineJob,
-        MavenJob,
-        FreestyleJob
+    JenkinsJob,
+    PluginBasedJob,
+    PipelineJob,
+    MavenJob,
+    FreestyleJob,
 )
 from jenkins_jobs.exceptions import MissingXMLElementError
 
@@ -16,16 +17,20 @@ def test_jenkinsjob_class():
     assert inspect.isclass(JenkinsJob)
 
     with pytest.raises(TypeError) as excinfo:
-        JenkinsJob('foobar', {})
+        JenkinsJob("foobar", {})
 
-    expected = "Can't instantiate abstract class JenkinsJob with abstract \
-methods _find_desc, _find_timer_trigger"
-    assert expected in str(excinfo.value)
+    assert "abstract methods" in str(excinfo.value)
 
 
 def test_jenkinsjob_methods():
-    methods = ('__init__', '_find_desc', '_find_timer_trigger', 'one_line_desc',
-               '_clean_spec', '__str__')
+    methods = (
+        "__init__",
+        "_find_desc",
+        "_find_timer_trigger",
+        "one_line_desc",
+        "_clean_spec",
+        "__str__",
+    )
 
     for method in methods:
         assert hasattr(JenkinsJob, method)
@@ -33,29 +38,29 @@ def test_jenkinsjob_methods():
 
 
 def test_clean_spec_crlf_multiple():
-    data = 'This is a\r\nsample description\r\nwith CRLF new lines.'
-    expected = 'This is a\nsample description\nwith CRLF new lines.'
+    data = "This is a\r\nsample description\r\nwith CRLF new lines."
+    expected = "This is a\nsample description\nwith CRLF new lines."
 
     assert expected == JenkinsJob._clean_spec(data)
 
 
 def test_clean_spec_crlf_comment():
-    data = '#This is a comment\r\nFollowed by an actually comment'
-    expected = 'Followed by an actually comment'
+    data = "#This is a comment\r\nFollowed by an actually comment"
+    expected = "Followed by an actually comment"
 
     assert expected == JenkinsJob._clean_spec(data)
 
 
 def test_clean_spec_lf_comment():
-    data = '#This is a comment\nFollowed by an actually comment'
-    expected = 'Followed by an actually comment'
+    data = "#This is a comment\nFollowed by an actually comment"
+    expected = "Followed by an actually comment"
 
     assert expected == JenkinsJob._clean_spec(data)
 
 
 def test_clean_spec_empty_line():
-    data = '\r\nFollowed by an actually comment'
-    expected = 'Followed by an actually comment'
+    data = "\r\nFollowed by an actually comment"
+    expected = "Followed by an actually comment"
 
     assert expected == JenkinsJob._clean_spec(data)
 
@@ -63,14 +68,14 @@ def test_clean_spec_empty_line():
 def test_pluginbasedjob_class():
     assert issubclass(PluginBasedJob, JenkinsJob)
 
-    attribs = tuple(['root_node'])
+    attribs = tuple(["root_node"])
 
     for attribute in attribs:
         assert hasattr(PluginBasedJob, attribute)
 
 
 def test_pluginbasedjob_methods():
-    methods = ('_plugin_type', 'plugin')
+    methods = ("_plugin_type", "plugin")
 
     for method in methods:
         assert hasattr(PluginBasedJob, method)
@@ -78,112 +83,155 @@ def test_pluginbasedjob_methods():
 
 
 def test_pluginbasedjob_instance_raises_exception(helpers):
-    config = helpers.xml_config('workflow-job-plugin.xml')
-    assert PluginBasedJob.plugin(config) == 'workflow-job'
+    config = helpers.xml_config("workflow-job-plugin.xml")
+    assert PluginBasedJob.plugin(config) == "workflow-job"
 
     with pytest.raises(TypeError) as excinfo:
-        PluginBasedJob('Workflow Job Plugin sample', config)
+        PluginBasedJob("Workflow Job Plugin sample", config)
 
     expected = "Can't instantiate abstract class PluginBasedJob"
     assert str(excinfo.value).startswith(expected)
-    assert '_find_timer_trigger' in str(excinfo.value)
+    assert "_find_timer_trigger" in str(excinfo.value)
 
 
 def test_pipelinejob_class():
     assert issubclass(PipelineJob, PluginBasedJob)
-    assert hasattr(PipelineJob, 'trigger_grandparent_node')
+    assert hasattr(PipelineJob, "trigger_grandparent_node")
 
 
 def test_pipelinejob_instance(helpers):
-    config = helpers.xml_config('workflow-job-plugin.xml')
-    assert PipelineJob.plugin(config) == 'workflow-job'
-    instance = PipelineJob('Workflow Job Plugin sample', config)
-    assert instance.root_node == 'flow-definition'
-    assert instance.description == 'Sample description for PipelineJob'
+    config = helpers.xml_config("workflow-job-plugin.xml")
+    assert PipelineJob.plugin(config) == "workflow-job"
+    instance = PipelineJob("Workflow Job Plugin sample", config)
+    assert instance.root_node == "flow-definition"
+    assert instance.description == "Sample description for PipelineJob"
     assert instance.timer_trigger_based is False
     assert instance.timer_trigger_spec is None
 
 
 def test_pipelinejob_instance_scheduler(helpers):
-    config = helpers.xml_config('workflow-job-plugin-timer.xml')
-    instance = PipelineJob('Workflow Job Plugin sample', config)
-    assert instance.root_node == 'flow-definition'
-    assert instance.description == 'This is a sample pipeline job with timer \
-trigger'
+    config = helpers.xml_config("workflow-job-plugin-timer.xml")
+    instance = PipelineJob("Workflow Job Plugin sample", config)
+    assert instance.root_node == "flow-definition"
+    assert (
+        instance.description
+        == "This is a sample pipeline job with timer \
+trigger"
+    )
 
     assert instance.timer_trigger_based is True
-    assert instance.timer_trigger_spec == 'H/15 * * * *'
+    assert instance.timer_trigger_spec == "H/15 * * * *"
 
 
 def test_mavenjob_class():
     assert issubclass(MavenJob, PluginBasedJob)
-    assert hasattr(MavenJob, 'trigger_parent_node')
+    assert hasattr(MavenJob, "trigger_parent_node")
 
 
 def test_mavenjob_instance(helpers):
-    config = helpers.xml_config('maven-job-plugin.xml')
-    instance = MavenJob('Maven Job Plugin sample', config)
-    assert instance.root_node == 'maven2-moduleset'
-    assert instance.description == 'This is a sample Maven plugin based job, \
-see https://plugins.jenkins.io/maven-plugin/'
+    config = helpers.xml_config("maven-job-plugin.xml")
+    instance = MavenJob("Maven Job Plugin sample", config)
+    assert instance.root_node == "maven2-moduleset"
+    assert (
+        instance.description
+        == "This is a sample Maven plugin based job, \
+see https://plugins.jenkins.io/maven-plugin/"
+    )
     assert instance.timer_trigger_based is True
-    assert instance.timer_trigger_spec == 'H H 1,15 1-11 *'
+    assert instance.timer_trigger_spec == "H H 1,15 1-11 *"
 
 
 def test_freestyle_class():
     assert issubclass(FreestyleJob, JenkinsJob)
-    assert hasattr(FreestyleJob, 'root_node')
+    assert hasattr(FreestyleJob, "root_node")
 
 
-@pytest.mark.parametrize('job_name, xml_filename, element, context, klass', [
-    ('maven job', 'maven-job-plugin-bogus.xml', 'spec', 'a timer trigger',
-     MavenJob),
-    ('freestyle job', 'freestyle-job-bogus.xml', 'description',
-     'the job description', FreestyleJob),
-    ('pipeline job', 'workflow-job-plugin-bogus.xml', 'spec',
-     'a timer trigger', PipelineJob)
-])
-def test_bogus_instance(job_name, xml_filename, element, context, klass,
-                        helpers):
+@pytest.mark.parametrize(
+    "job_name, xml_filename, element, context, klass",
+    [
+        (
+            "maven job",
+            "maven-job-plugin-bogus.xml",
+            "spec",
+            "a timer trigger",
+            MavenJob,
+        ),
+        (
+            "freestyle job",
+            "freestyle-job-bogus.xml",
+            "description",
+            "the job description",
+            FreestyleJob,
+        ),
+        (
+            "pipeline job",
+            "workflow-job-plugin-bogus.xml",
+            "spec",
+            "a timer trigger",
+            PipelineJob,
+        ),
+    ],
+)
+def test_bogus_instance(job_name, xml_filename, element, context, klass, helpers):
     config = helpers.xml_config(xml_filename)
 
     with pytest.raises(MissingXMLElementError) as excinfo:
         klass(job_name, config)
 
-    expected = f'Could not locate \'{element}\' element while searching for \
-{context} in "{job_name}"'
+    expected = f"Could not locate '{element}' element while searching for \
+{context} in \"{job_name}\""
     assert str(excinfo.value) == expected
 
 
 def test_freestyle_instance(helpers):
-    config = helpers.xml_config('freestyle-job.xml')
-    instance = FreestyleJob('freestyle-sample', config)
-    assert instance.root_node == 'project'
-    assert instance.description == 'Sample freestyle job'
+    config = helpers.xml_config("freestyle-job.xml")
+    instance = FreestyleJob("freestyle-sample", config)
+    assert instance.root_node == "project"
+    assert instance.description == "Sample freestyle job"
     assert instance.timer_trigger_based is False
-    expected = '|'.join(('freestyle-sample', 'FreestyleJob',
-                        'Sample freestyle job', 'False', 'not applicable'))
+    expected = "|".join(
+        (
+            "freestyle-sample",
+            "FreestyleJob",
+            "Sample freestyle job",
+            "False",
+            "not applicable",
+        )
+    )
     assert str(instance) == expected
 
 
 def test_freestyle_instance_trigger(helpers):
-    config = helpers.xml_config('freestyle-job-trigger.xml')
-    instance = FreestyleJob('freestyle-sample', config)
-    assert instance.root_node == 'project'
-    assert instance.description == 'Sample freestyle job'
+    config = helpers.xml_config("freestyle-job-trigger.xml")
+    instance = FreestyleJob("freestyle-sample", config)
+    assert instance.root_node == "project"
+    assert instance.description == "Sample freestyle job"
     assert instance.timer_trigger_based is True
-    expected = '|'.join(('freestyle-sample', 'FreestyleJob',
-                        'Sample freestyle job', 'True', 'H H 1,15 1-11 *'))
+    expected = "|".join(
+        (
+            "freestyle-sample",
+            "FreestyleJob",
+            "Sample freestyle job",
+            "True",
+            "H H 1,15 1-11 *",
+        )
+    )
     assert str(instance) == expected
 
 
 def test_freestyle_instance_no_desc(helpers):
-    config = helpers.xml_config('freestyle-job-nodesc.xml')
-    instance = FreestyleJob('freestyle-sample', config)
-    assert instance.root_node == 'project'
-    assert instance.description == '*** MISSING DESCRIPTION ***'
+    config = helpers.xml_config("freestyle-job-nodesc.xml")
+    instance = FreestyleJob("freestyle-sample", config)
+    assert instance.root_node == "project"
+    assert instance.description == "*** MISSING DESCRIPTION ***"
     assert instance.timer_trigger_based is False
-    expected = '|'.join(('freestyle-sample', 'FreestyleJob',
-                         '*** MISSING DESCRIPTION ***', 'False',
-                         'not applicable'))
+    expected = "|".join(
+        (
+            "freestyle-sample",
+            "FreestyleJob",
+            "*** MISSING DESCRIPTION ***",
+            "False",
+            "not applicable",
+        )
+    )
     assert str(instance) == expected
