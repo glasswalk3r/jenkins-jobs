@@ -23,7 +23,7 @@ test_requirements = [
 setup(
     author="Alceu Rodrigues de Freitas Junior",
     author_email="glasswalk3r@yahoo.com.br",
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -57,6 +57,6 @@ than jenkins-cli.jar",
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/glasswalk3r/jenkins-jobs",
-    version="0.1.6",
+    version="0.1.7",
     zip_safe=False,
 )
