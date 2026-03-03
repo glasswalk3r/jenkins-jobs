@@ -1,2 +1,2 @@
-xmltodict==1.0.3
+xmltodict==1.0.4
 python-jenkins==1.8.3
