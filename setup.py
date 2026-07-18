@@ -23,7 +23,7 @@ test_requirements = [
 setup(
     author="Alceu Rodrigues de Freitas Junior",
     author_email="glasswalk3r@yahoo.com.br",
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -31,11 +31,11 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
     description="Listing all jobs on a Jenkins server with more information \
 than jenkins-cli.jar",
@@ -57,6 +57,6 @@ than jenkins-cli.jar",
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/glasswalk3r/jenkins-jobs",
-    version="0.1.9",
+    version="0.1.10",
     zip_safe=False,
 )
