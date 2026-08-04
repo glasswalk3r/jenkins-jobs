@@ -1,7 +1,14 @@
 ---
 version: 2
 updates:
+  # Reads dependencies straight from pyproject.toml's PEP 621
+  # [project.dependencies] / [project.optional-dependencies] tables (uv.lock
+  # itself isn't parsed, so run `uv lock` after a bump PR merges).
   - package-ecosystem: pip  # See documentation for possible values
     directory: /  # Location of package manifests
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
       interval: weekly
