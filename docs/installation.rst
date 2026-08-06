@@ -40,11 +40,13 @@ Or download the `tarball`_:
 
     $ curl -OJL https://github.com/glasswalk3r/jenkins_jobs/tarball/master
 
-Once you have a copy of the source, you can install it with:
+Once you have a copy of the source, you can install it with `uv`_:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ uv pip install .
+
+.. _uv: https://docs.astral.sh/uv/
 
 
 .. _Github repo: https://github.com/glasswalk3r/jenkins_jobs

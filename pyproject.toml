@@ -1,0 +1,70 @@
+[project]
+name = "jenkins_jobs"
+version = "0.1.10"
+description = "Listing all jobs on a Jenkins server with more information than jenkins-cli.jar"
+readme = "README.rst"
+requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Alceu Rodrigues de Freitas Junior", email = "glasswalk3r@yahoo.com.br" },
+]
+keywords = ["jenkins", "jobs"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "python-jenkins>=1.7.0",
+    "xmltodict>=0.12.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/glasswalk3r/jenkins-jobs"
+Repository = "https://github.com/glasswalk3r/jenkins-jobs"
+Issues = "https://github.com/glasswalk3r/jenkins-jobs/issues"
+
+[project.scripts]
+jenkins_jobs = "jenkins_jobs.reporter:main"
+jenkins_exporter = "jenkins_jobs.exporter:main"
+
+# PEP 621 optional-dependencies (rather than the newer PEP 735
+# [dependency-groups]) so Dependabot's pip ecosystem — confirmed to parse
+# [project.dependencies]/[project.optional-dependencies] — can see and update
+# these too. Install with `uv sync --extra dev`.
+[project.optional-dependencies]
+dev = [
+    "bump2version==1.0.1",
+    "coverage==7.15.2",
+    "pytest==9.1.1",
+    "ruff==0.16.1",
+    "Sphinx==8.2.3",
+    "tox==4.58.0",
+    # -bare: plugin only, relies on the system `uv` this project already
+    # requires everywhere else, instead of bundling its own copy.
+    "tox-uv-bare==1.36.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 127
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+# pycodestyle (E, W) + pyflakes (F) + mccabe complexity (C90), matching the
+# checks flake8 ran before: E9/F63/F7/F82 fail the build, everything else
+# (including C901 complexity) is a warning-only exit-zero check in CI.
+select = ["E", "F", "W", "C90"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10

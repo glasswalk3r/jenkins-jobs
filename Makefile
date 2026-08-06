@@ -50,25 +50,25 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint: ## check style with flake8
-	flake8 src/jenkins_jobs tests
+lint: ## check style with ruff
+	uv run ruff check src/jenkins_jobs tests
 
 test: ## run tests quickly with the default Python
-	pytest -v
+	uv run pytest -v
 
 test-all: ## run tests on every Python version with tox
-	python -m tox
+	uv run tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source jenkins_jobs -m pytest
-	coverage report -m
-	coverage html
+	uv run coverage run --source jenkins_jobs -m pytest
+	uv run coverage report -m
+	uv run coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/jenkins_jobs.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc --ext-autodoc -o docs/ src/jenkins_jobs
+	uv run sphinx-apidoc --ext-autodoc -o docs/ src/jenkins_jobs
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -77,29 +77,28 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: dist ## package and upload a release
-	twine upload dist/*
+	uv publish
 
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
+	uv build
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	uv pip install .
 
-init:
-	pyenv virtualenv $(VIRTUALENV)
-	pyenv local $(VIRTUALENV)
-	python -m pip install --upgrade pip wheel setuptools
+init: ## create the uv-managed virtualenv and install all dependencies
+	uv venv
+	uv sync --extra dev
 
-update-deps:
-	python -m pip install --use-pep517 --no-build-isolation -r requirements-dev.txt
+update-deps: ## refresh uv.lock to the latest allowed versions and reinstall
+	uv lock --upgrade
+	uv sync --extra dev
 
 debug:
-	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar
+	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && uv run python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar
 
 run:
-	python jobs_reporter.py --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
+	uv run python jobs_reporter.py --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
 
 local:
-	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && python jobs_reporter.py --user foobar --token foobar --jenkins foobar
+	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && uv run python jobs_reporter.py --user foobar --token foobar --jenkins foobar
