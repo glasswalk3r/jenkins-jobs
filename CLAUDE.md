@@ -18,8 +18,11 @@ tox, bump2version) in the `dev` extra (`[project.optional-dependencies]`) — in
 
 Two console scripts are installed (see `[project.scripts]` in `pyproject.toml`):
 
-* `jenkins_jobs` (`jenkins_jobs.reporter:main`) — connects to a Jenkins server (or reads a
-  shelve-format snapshot via the `JOBS_REPORTER_DATA` env var) and prints one report line per job.
+* `jenkins_jobs` (`jenkins_jobs.reporter:main`) — connects to a Jenkins server (`--user`/`--token`/
+  `--jenkins`) or reads a shelve-format snapshot (`--shelve-file`, mutually exclusive with the REST
+  options) and reports one line per job, either as pipe CSV printed to stdout (`--format csv`,
+  the default) or as a self-contained HTML5 report with a Chart.js bar chart of job counts by
+  type, written to `./report.html` (`--format html`).
 * `jenkins_exporter` (`jenkins_jobs.exporter:main`) — connects to a Jenkins server over the REST
   API and dumps every job's raw config (parsed from XML) into a local Python `shelve` file
   (`./jenkins_jobs.shelve`), so it can be replayed locally without hitting the server again.
@@ -49,9 +52,13 @@ and `make test` before pushing. `tox.ini` uses the `tox-uv` plugin (`runner =
 uv-venv-lock-runner`) so tox environments are created and synced with `uv` instead of
 virtualenv+pip.
 
-Local development without hitting a real Jenkins server: point `JOBS_REPORTER_DATA` at a shelve
+Local development without hitting a real Jenkins server: pass `--shelve-file` pointing at a shelve
 file produced by `jenkins_exporter` (or `make local`/`make debug`, which use `$DATA_SAMPLE`) and
-`jenkins_jobs` will use `FileSystemRetriever` instead of `RESTRetriever`.
+`jenkins_jobs` will use `FileSystemRetriever` instead of `RESTRetriever`. `--shelve-file` is
+mutually exclusive with `--user`/`--token`/`--jenkins` — `reporter.py`'s argparse setup puts the
+two into separate argument groups and enforces the exclusivity/all-or-nothing rules itself after
+`parse_args()`, since argparse's own `mutually_exclusive_group` can't express "all three or none
+of this set, exclusive of that other option".
 
 ## Architecture
 
@@ -90,10 +97,11 @@ that job type's specific XML shape) → `str(job)` produces one report line.
   `JenkinsJob` subclass expects (missing nodes are treated as data errors, not bugs, since the
   XML shape is plugin-controlled and not officially documented).
 
-* `reporter.py` / `exporter.py` — thin argparse-based CLI entry points; both require
-  `--user`/`--token`/`--jenkins` and validate the Jenkins URL has a schema (raising
-  `NoSchemaSuppliedRESTError` otherwise, since a missing schema produces a confusing error deep
-  inside `requests` instead).
+* `reporter.py` / `exporter.py` — thin argparse-based CLI entry points. `exporter.py` always
+  requires `--user`/`--token`/`--jenkins`. `reporter.py` requires either those three together (REST
+  mode) or `--shelve-file` alone (local snapshot mode); either way, when REST mode is used, the
+  Jenkins URL is validated to have a schema (raising `NoSchemaSuppliedRESTError` otherwise, since a
+  missing schema produces a confusing error deep inside `requests` instead).
 
 XML is parsed with `xmltodict`, so job configs move through the codebase as nested `dict`/
 `OrderedDict` structures mirroring the original XML — reading a fixture file in `tests/raw_data/`

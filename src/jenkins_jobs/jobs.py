@@ -3,13 +3,10 @@
 from collections import deque
 from abc import ABC, abstractmethod
 
-from jenkins_jobs.exceptions import (
-        MissingXMLElementError,
-        InvalidFindTimerTriggerError
-)
+from jenkins_jobs.exceptions import MissingXMLElementError, InvalidFindTimerTriggerError
 
 
-class TimerTriggerResult():
+class TimerTriggerResult:
     """Representation of a timer trigger search.
 
     A instance of this class must be returned by implementations of the
@@ -48,8 +45,8 @@ class TimerTriggerResult():
 class JenkinsJob(ABC):
     """Base class for all expected Jenkins job types."""
 
-    timer_trigger_node = 'hudson.triggers.TimerTrigger'
-    default_miss_desc = '*** MISSING DESCRIPTION ***'
+    timer_trigger_node = "hudson.triggers.TimerTrigger"
+    default_miss_desc = "*** MISSING DESCRIPTION ***"
 
     def __init__(self, name, config):
         """Initialize the instance.
@@ -101,17 +98,17 @@ class JenkinsJob(ABC):
         :rtype: str
         """
         description = self.description
-        description = description.replace('\r\n', '\n')
-        lines = description.lstrip().rstrip().split('\n')
+        description = description.replace("\r\n", "\n")
+        lines = description.lstrip().rstrip().split("\n")
         new_lines = deque()
 
         for line in lines:
-            if line == '':
+            if line == "":
                 continue
 
             new_lines.append(line)
 
-        result = ' '.join(new_lines)
+        result = " ".join(new_lines)
 
         return result
 
@@ -131,16 +128,16 @@ class JenkinsJob(ABC):
             return spec
 
         clean_lines = deque()
-        normalized = timer_spec.replace('\r\n', '\n')
-        lines = normalized.split('\n')
+        normalized = timer_spec.replace("\r\n", "\n")
+        lines = normalized.split("\n")
 
         for line in lines:
-            if line.startswith('#') or line == '':
+            if line.startswith("#") or line == "":
                 continue
             else:
                 clean_lines.append(line)
 
-        return '\n'.join(clean_lines)
+        return "\n".join(clean_lines)
 
     def __str__(self):
         """String representation of the instance.
@@ -149,25 +146,24 @@ class JenkinsJob(ABC):
         :rtype: str
         """
         if self.timer_trigger_based:
-            return '|'.join([
-                self.name,
-                self.__class__.__name__,
-                self.one_line_desc(),
-                str(self.timer_trigger_based),
-                self.timer_trigger_spec
-            ])
+            return "|".join(
+                [
+                    self.name,
+                    self.__class__.__name__,
+                    self.one_line_desc(),
+                    str(self.timer_trigger_based),
+                    self.timer_trigger_spec,
+                ]
+            )
         else:
-            return '|'.join([
-                self.name,
-                self.__class__.__name__,
-                self.one_line_desc(),
-                str(self.timer_trigger_based),
-                'not applicable'
-            ])
+            return "|".join(
+                [self.name, self.__class__.__name__, self.one_line_desc(), str(self.timer_trigger_based), "not applicable"]
+            )
 
 
 class PluginBasedJob(JenkinsJob):
     """Representation of a Jenkins job that is based on a plugin."""
+
     root_node = None
 
     @staticmethod
@@ -198,15 +194,15 @@ class PluginBasedJob(JenkinsJob):
         :rtype: str
         """
         plugin_type = PluginBasedJob._plugin_type(config)
-        plugin = config[plugin_type]['@plugin']
+        plugin = config[plugin_type]["@plugin"]
         # plugin have their version include most of the times
-        return plugin.split('@')[0].lower()
+        return plugin.split("@")[0].lower()
 
     def _find_desc(self, config):
         """Implement parent class abstract method."""
         description = None
         plugin_type = PluginBasedJob._plugin_type(config)
-        description = config[plugin_type]['description']
+        description = config[plugin_type]["description"]
 
         if description is None:
             description = self.default_miss_desc
@@ -217,25 +213,24 @@ class PluginBasedJob(JenkinsJob):
 class PipelineJob(PluginBasedJob):
     """A job that is based on the Pipeline plugin."""
 
-    root_node = 'flow-definition'
-    trigger_grandparent_node = 'org.jenkinsci.plugins.workflow.job.properties.\
-PipelineTriggersJobProperty'
+    root_node = "flow-definition"
+    trigger_grandparent_node = "org.jenkinsci.plugins.workflow.job.properties.\
+PipelineTriggersJobProperty"
 
     def _find_timer_trigger(self, config):
         """Implement parent class abstract method."""
         result = None
         try:
-            tmp = config[self.root_node]['properties']
+            tmp = config[self.root_node]["properties"]
 
             if self.trigger_grandparent_node in tmp:
                 tmp = tmp[self.trigger_grandparent_node]
 
-                if tmp and 'triggers' in tmp:
-                    tmp = tmp['triggers']
+                if tmp and "triggers" in tmp:
+                    tmp = tmp["triggers"]
 
                     if tmp and self.timer_trigger_node in tmp:
-                        spec = self._clean_spec(
-                                tmp[self.timer_trigger_node]['spec'])
+                        spec = self._clean_spec(tmp[self.timer_trigger_node]["spec"])
                         # yes, there might be a existing node with nothing
                         # defined
                         if spec:
@@ -243,8 +238,7 @@ PipelineTriggersJobProperty'
                         else:
                             result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name,
-                                         context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context="a timer trigger")
 
         if result is None:
             result = TimerTriggerResult(False, None)
@@ -255,8 +249,8 @@ PipelineTriggersJobProperty'
 class MavenJob(PluginBasedJob):
     """A job that is based on the Maven plugin."""
 
-    root_node = 'maven2-moduleset'
-    trigger_parent_node = 'triggers'
+    root_node = "maven2-moduleset"
+    trigger_parent_node = "triggers"
 
     def _find_timer_trigger(self, config):
         """Implement parent class abstract method."""
@@ -269,8 +263,7 @@ class MavenJob(PluginBasedJob):
                 tmp = tmp[self.trigger_parent_node]
 
                 if tmp and self.timer_trigger_node in tmp:
-                    spec = self._clean_spec(
-                            tmp[self.timer_trigger_node]['spec'])
+                    spec = self._clean_spec(tmp[self.timer_trigger_node]["spec"])
                     # yes, there might be a existing node with nothing
                     # defined
                     if spec:
@@ -278,8 +271,7 @@ class MavenJob(PluginBasedJob):
                     else:
                         result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name,
-                                         context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context="a timer trigger")
 
         if result is None:
             result = TimerTriggerResult(False, None)
@@ -290,17 +282,16 @@ class MavenJob(PluginBasedJob):
 class FreestyleJob(JenkinsJob):
     """A free style job."""
 
-    root_node = 'project'
+    root_node = "project"
 
     def _find_desc(self, config):
         """Implement parent class abstract method."""
         description = None
 
         try:
-            description = config[self.root_node]['description']
-        except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name,
-                                         context='the job description')
+            description = config[self.root_node]["description"]
+        except KeyError:
+            pass
 
         if description is None:
             return self.default_miss_desc
@@ -312,20 +303,18 @@ class FreestyleJob(JenkinsJob):
         result = None
 
         try:
-            tmp = config[self.root_node]['triggers']
+            tmp = config[self.root_node]["triggers"]
 
             # tmp will be None if there is not trigger at all
             if tmp and self.timer_trigger_node in tmp:
-                spec = self._clean_spec(
-                        tmp[self.timer_trigger_node]['spec'])
+                spec = self._clean_spec(tmp[self.timer_trigger_node]["spec"])
                 # yes, there might be a existing node with nothing defined
                 if spec:
                     result = TimerTriggerResult(True, spec)
                 else:
                     result = TimerTriggerResult(True, None)
         except KeyError as e:
-            raise MissingXMLElementError(element=str(e), job_name=self.name,
-                                         context='a timer trigger')
+            raise MissingXMLElementError(element=str(e), job_name=self.name, context="a timer trigger")
 
         if result is None:
             result = TimerTriggerResult(False, None)

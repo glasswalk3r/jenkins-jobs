@@ -1,5 +1,7 @@
 """Tests for `jenkins_jobs` package."""
 import inspect
+import shelve
+
 import pytest
 
 from jenkins_jobs.retrievers import Retriever, FileSystemRetriever, RESTRetriever
@@ -51,3 +53,25 @@ def test_retriever_invalid_raises_exception():
         Retriever._job_builder('Empty Plugin sample', {})
 
     assert 'None' in str(excinfo.value)
+
+
+def test_filesystemretriever_all_jobs(tmp_path, helpers):
+    # mirrors what jenkins_exporter actually stores: the job metadata dict
+    # returned by python-jenkins' `get_jobs()`, with the xmltodict-parsed
+    # config tucked under a `definition` key.
+    shelve_path = str(tmp_path / 'jenkins_jobs.shelve')
+    config = helpers.xml_config('freestyle-job-trigger.xml')
+
+    with shelve.open(shelve_path, flag='n') as shelf:
+        shelf['freestyle sample'] = {
+            'url': 'http://localhost:8080/job/freestyle%20sample/',
+            'color': 'blue',
+            'definition': config,
+        }
+
+    retriever = FileSystemRetriever(shelve_path)
+    jobs = list(retriever.all_jobs()())
+
+    assert len(jobs) == 1
+    assert jobs[0].__class__.__name__ == 'FreestyleJob'
+    assert jobs[0].name == 'freestyle sample'
