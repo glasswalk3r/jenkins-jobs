@@ -98,3 +98,6 @@ dmypy.json
 .vagrant
 
 config.mk
+*.shelve
+*.html
+*.csv
