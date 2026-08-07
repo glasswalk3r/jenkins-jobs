@@ -157,13 +157,6 @@ def test_freestyle_class():
             MavenJob,
         ),
         (
-            "freestyle job",
-            "freestyle-job-bogus.xml",
-            "description",
-            "the job description",
-            FreestyleJob,
-        ),
-        (
             "pipeline job",
             "workflow-job-plugin-bogus.xml",
             "spec",
@@ -235,3 +228,14 @@ def test_freestyle_instance_no_desc(helpers):
         )
     )
     assert str(instance) == expected
+
+
+def test_freestyle_instance_missing_desc_key(helpers):
+    # unlike an empty <description></description> element (covered by
+    # test_freestyle_instance_no_desc above), some real Jenkins freestyle
+    # jobs omit the <description/> element entirely. That's not a data
+    # error: it must be treated the same as an empty description instead of
+    # raising MissingXMLElementError.
+    config = helpers.xml_config("freestyle-job-bogus.xml")
+    instance = FreestyleJob("freestyle-sample", config)
+    assert instance.description == "*** MISSING DESCRIPTION ***"

@@ -30,7 +30,7 @@ You can install this project module straight from [PyPi](https://pypi.org):
 pip install jenkins_jobs
 ```
 
-Then just fire the `jenkins_job` CLI:
+Then just fire the `jenkins_jobs` CLI:
 
 ```
 $ jenkins_jobs --user admin --token 116f3e55f677416a7c054faa20fbbcf0be --jenkins http://localhost:8080
@@ -39,8 +39,41 @@ Maven Sample|MavenJob|This is a sample Maven plugin based job, see https://plugi
 pipeline-sample|PipelineJob|This is a sample pipeline job|True|H/15 * * * *
 ```
 
-You should be able to just import this output as a CSV with `|` (pipe) as the
-field separator. In future, different output formats might be provided.
+By default, the output is a CSV with `|` (pipe) as the field separator, printed
+to stdout, so you should be able to just import it. Pass `--format html`
+instead to generate a self-contained HTML5 report with a table of all jobs
+and a bar chart (built with [Chart.js](https://www.chartjs.org/)) of the
+total number of jobs by type; it is written to `report.html` in the current
+directory rather than printed:
+
+```
+$ jenkins_jobs --user admin --token 116f3e55f677416a7c054faa20fbbcf0be --jenkins http://localhost:8080 --format html
+HTML report written to report.html
+```
+
+`--format` accepts `csv` (the default) or `html`; anything else is rejected.
+
+### Exporting jobs for local/offline use
+
+The `jenkins_exporter` CLI connects to a Jenkins server and dumps every job's
+configuration into a local
+[Shelve](https://docs.python.org/3/library/shelve.html) file
+(`./jenkins_jobs.shelve` in the current directory), so it can be replayed
+later without hitting the server again:
+
+```
+$ jenkins_exporter --user admin --token 116f3e55f677416a7c054faa20fbbcf0be --jenkins http://localhost:8080
+Starting...
+Finished
+```
+
+Pass that file to `jenkins_jobs` with `--shelve-file` and it will read from it
+instead of connecting to Jenkins over the REST API. `--shelve-file` cannot be
+combined with `--user`/`--token`/`--jenkins` — it's one or the other:
+
+```
+$ jenkins_jobs --shelve-file ./jenkins_jobs.shelve
+```
 
 ## More information
 

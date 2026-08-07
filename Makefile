@@ -73,7 +73,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-servedocs: docs ## compile the docs watching for changes
+serverdocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: dist ## package and upload a release
@@ -95,10 +95,10 @@ update-deps: ## refresh uv.lock to the latest allowed versions and reinstall
 	uv sync --extra dev
 
 debug:
-	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && uv run python -m pdb jobs_reporter.py --user foobar --token foobar --jenkins foobar
+	uv run python -m pdb -m jenkins_jobs.reporter --shelve-file $(DATA_SAMPLE)
 
 run:
-	uv run python jobs_reporter.py --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
+	uv run jenkins_jobs --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
 
 local:
-	export JOBS_REPORTER_DATA=$(DATA_SAMPLE) && uv run python jobs_reporter.py --user foobar --token foobar --jenkins foobar
+	uv run jenkins_jobs --shelve-file $(DATA_SAMPLE)
