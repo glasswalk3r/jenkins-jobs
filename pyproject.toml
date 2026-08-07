@@ -32,8 +32,8 @@ Repository = "https://github.com/glasswalk3r/jenkins-jobs"
 Issues = "https://github.com/glasswalk3r/jenkins-jobs/issues"
 
 [project.scripts]
-jenkins_jobs = "jenkins_jobs.reporter:main"
-jenkins_exporter = "jenkins_jobs.exporter:main"
+jenkins-jobs = "jenkins_jobs.reporter:main"
+jenkins-exporter = "jenkins_jobs.exporter:main"
 
 # PEP 621 optional-dependencies (rather than the newer PEP 735
 # [dependency-groups]) so Dependabot's pip ecosystem — confirmed to parse
