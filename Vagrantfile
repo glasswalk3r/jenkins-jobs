@@ -44,7 +44,7 @@ Vagrant.configure('2') do |config|
 
     while test 1
     do
-          if ![ -f "${pwd_file}" ]
+          if ! [ -f "${pwd_file}" ]
           then
               sleep 5
           else
