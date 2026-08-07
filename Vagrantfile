@@ -40,6 +40,8 @@ Vagrant.configure('2') do |config|
     dnf install python3-xmltodict python3-jenkins jenkins -y
     systemctl enable jenkins
     systemctl start jenkins
+    firewall-cmd --permanent --add-port=8080/tcp
+    firewall-cmd --reload
     pwd_file=/var/lib/jenkins/secrets/initialAdminPassword
 
     while test 1
