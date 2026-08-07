@@ -1,6 +1,6 @@
 [project]
 name = "jenkins_jobs"
-version = "0.1.10"
+version = "0.2.0"
 description = "Listing all jobs on a Jenkins server with more information than jenkins-cli.jar"
 readme = "README.rst"
 requires-python = ">=3.11"
