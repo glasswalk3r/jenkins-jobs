@@ -46,7 +46,7 @@ dev = [
     "pytest==9.1.1",
     "ruff==0.16.4",
     "Sphinx==9.0.4",
-    "tox==4.60.0",
+    "tox==4.60.1",
     # -bare: plugin only, relies on the system `uv` this project already
     # requires everywhere else, instead of bundling its own copy.
     "tox-uv-bare==1.36.0",
