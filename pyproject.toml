@@ -49,7 +49,7 @@ dev = [
     "tox==4.64.5",
     # -bare: plugin only, relies on the system `uv` this project already
     # requires everywhere else, instead of bundling its own copy.
-    "tox-uv-bare==1.36.0",
+    "tox-uv-bare==1.36.1",
 ]
 
 [build-system]
