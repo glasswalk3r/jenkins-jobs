@@ -42,7 +42,7 @@ jenkins-exporter = "jenkins_jobs.exporter:main"
 [project.optional-dependencies]
 dev = [
     "bump2version==1.0.1",
-    "coverage==7.17.0",
+    "coverage==7.17.2",
     "pytest==9.2.0",
     "ruff==0.17.3",
     "Sphinx==9.0.4",
