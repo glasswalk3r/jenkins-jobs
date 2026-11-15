@@ -44,7 +44,7 @@ dev = [
     "bump2version==1.0.1",
     "coverage==7.17.2",
     "pytest==9.2.0",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
     "Sphinx==9.0.4",
     "tox==4.67.13",
     # -bare: plugin only, relies on the system `uv` this project already
