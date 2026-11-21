@@ -6,104 +6,110 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `jenkins_jobs` is a small Python 3.11+ CLI package that talks to a Jenkins server (or a locally
 cached snapshot of one) and reports information about each job — name, job type, description,
-and whether/how it's timer-triggered — as pipe-separated (`|`) CSV lines. It exists because
-neither the Jenkins CLI nor the raw REST API give a usable summary of jobs across a large Jenkins
-instance, and the plugin-specific job XML formats are otherwise undocumented and inconsistent.
+and whether/how it's timer-triggered. It exists because neither the Jenkins CLI nor the raw REST
+API give a usable summary of jobs across a large Jenkins instance, and the plugin-specific job XML
+formats are otherwise undocumented and inconsistent.
 
 Packaging/dependency management uses `uv` and a PEP 621 `pyproject.toml` (build backend:
-`uv_build`); there is no `setup.py`/`setup.cfg` or `requirements*.txt` anymore. Runtime
-dependencies live in `[project.dependencies]`, dev-only ones (pytest, ruff, coverage, Sphinx,
-tox, bump2version) in the `dev` extra (`[project.optional-dependencies]`) — install both with
-`uv sync --extra dev`. `uv.lock` pins the resolved graph and should be committed.
+`uv_build`); there is no `setup.py`/`setup.cfg` or `requirements*.txt`. Runtime dependencies live
+in `[project.dependencies]`, dev-only ones (pytest, ruff, coverage, Sphinx, tox, tox-uv-bare,
+bump2version) in the `dev` extra — install both with `uv sync --extra dev` (or `make init`).
+`uv.lock` pins the resolved graph and should be committed. Dev deps are deliberately kept in
+`[project.optional-dependencies]` rather than PEP 735 `[dependency-groups]` so Dependabot's pip
+ecosystem can see and bump them — don't migrate them.
 
-Two console scripts are installed (see `[project.scripts]` in `pyproject.toml`):
+Two console scripts are installed (`[project.scripts]` — note the **hyphenated** names):
 
-* `jenkins_jobs` (`jenkins_jobs.reporter:main`) — connects to a Jenkins server (`--user`/`--token`/
-  `--jenkins`) or reads a shelve-format snapshot (`--shelve-file`, mutually exclusive with the REST
-  options) and reports one line per job, either as pipe CSV printed to stdout (`--format csv`,
-  the default) or as a self-contained HTML5 report with a Chart.js bar chart of job counts by
-  type, written to `./report.html` (`--format html`).
-* `jenkins_exporter` (`jenkins_jobs.exporter:main`) — connects to a Jenkins server over the REST
+* `jenkins-jobs` (`jenkins_jobs.reporter:main`) — connects to a Jenkins server
+  (`--user`/`--token`/`--jenkins`) or reads a shelve-format snapshot (`--shelve-file`, mutually
+  exclusive with the REST options) and writes a report to the current directory: `./report.csv`
+  (`--format csv`, the default; pipe-separated, one line per job) or `./report.html`
+  (`--format html`; self-contained HTML5 with a Chart.js bar chart of job counts by type, Chart.js
+  loaded from a CDN).
+* `jenkins-exporter` (`jenkins_jobs.exporter:main`) — connects to a Jenkins server over the REST
   API and dumps every job's raw config (parsed from XML) into a local Python `shelve` file
   (`./jenkins_jobs.shelve`), so it can be replayed locally without hitting the server again.
 
 ## Commands
 
 ```bash
-make lint          # uv run ruff check src/jenkins_jobs tests
-make test          # uv run pytest -v (single Python version)
+make init           # uv venv + uv sync --extra dev
+make lint           # uv run ruff check src/jenkins_jobs tests
+make test           # uv run pytest -v (single Python version)
 make test-all       # uv run tox (via tox-uv) — runs pytest across Python 3.11-3.14
 make coverage       # coverage run + report + html, opens htmlcov/index.html
-make docs           # regenerate Sphinx API docs and build HTML docs
+make docs           # regenerate Sphinx API docs (sphinx-apidoc) and build HTML docs
+make dist           # uv build
+make update-deps    # uv lock --upgrade + resync
 ```
 
-Run a single test file or test:
+Run a single test file or test (run from the repo root — the `helpers.xml_config()` fixture opens
+`tests/raw_data/<file>` with a relative path):
 
 ```bash
 uv run pytest tests/test_jobs.py
 uv run pytest tests/test_jobs.py::test_clean_spec_crlf_multiple
 ```
 
-CI (`.github/workflows/main.yml`) runs, for each supported Python version (3.11–3.14) via
-`astral-sh/setup-uv`: a ruff syntax-error check (`--select=E9,F63,F7,F82`), a full `ruff check`
-(warnings don't fail the build), `pytest`, and a `pip-audit` vulnerability scan of the resolved
-project (`inputs: .`, reading `pyproject.toml`/`uv.lock`). Match this locally with `make lint`
-and `make test` before pushing. `tox.ini` uses the `tox-uv` plugin (`runner =
-uv-venv-lock-runner`) so tox environments are created and synced with `uv` instead of
-virtualenv+pip.
+Ruff config is in `pyproject.toml` (line length 127, rules `E,F,W,C90`, max complexity 10, `docs/`
+excluded). CI (`.github/workflows/main.yml`) runs, for each Python 3.11–3.14 via
+`astral-sh/setup-uv`: `ruff check . --select=E9,F63,F7,F82` (fails the build), a full
+`ruff check . --exit-zero` (warnings only), `pytest`, and a `pip-audit` scan of the project.
+Match this locally with `make lint` and `make test` before pushing. `tox.ini` uses the
+`tox-uv-bare` plugin (`runner = uv-venv-lock-runner`), relying on the system `uv`.
 
-Local development without hitting a real Jenkins server: pass `--shelve-file` pointing at a shelve
-file produced by `jenkins_exporter` (or `make local`/`make debug`, which use `$DATA_SAMPLE`) and
-`jenkins_jobs` will use `FileSystemRetriever` instead of `RESTRetriever`. `--shelve-file` is
-mutually exclusive with `--user`/`--token`/`--jenkins` — `reporter.py`'s argparse setup puts the
-two into separate argument groups and enforces the exclusivity/all-or-nothing rules itself after
-`parse_args()`, since argparse's own `mutually_exclusive_group` can't express "all three or none
-of this set, exclusive of that other option".
+Local development without a real Jenkins server: pass `--shelve-file` pointing at a shelve file
+produced by `jenkins-exporter`, e.g. `uv run jenkins-jobs --shelve-file ./jenkins_jobs.shelve`.
+`make local`/`make debug` (pdb) do the same using `DATA_SAMPLE=<path>` passed on the `make` command
+line. `reporter.py` puts the REST options and `--shelve-file` in separate argparse groups and
+enforces the exclusivity / all-three-or-none rules itself after `parse_args()`, since argparse's
+`mutually_exclusive_group` can't express that.
 
 ## Architecture
 
-Source lives under `src/jenkins_jobs/` (the `uv_build` backend picks it up from `src/` by
-default, matching the project name). Tests live in `tests/` and use fixture XML files in
-`tests/raw_data/` (representative raw Jenkins job-config XML for each supported plugin, including
-"bogus" variants for negative testing) via the `helpers.xml_config()` fixture defined in
+Source lives under `src/jenkins_jobs/`; tests in `tests/` use fixture XML files in
+`tests/raw_data/` (representative raw Jenkins job-config XML for each supported job type,
+including "bogus" variants for negative testing) via the `helpers.xml_config()` fixture in
 `tests/conftest.py`.
 
 The core flow is: **Retriever** (fetches raw job config) → **job factory** (picks a `JenkinsJob`
-subclass based on structure) → **JenkinsJob instance** (parses description + timer trigger from
-that job type's specific XML shape) → `str(job)` produces one report line.
+subclass based on XML structure) → **JenkinsJob instances** (parse description + timer trigger
+from that job type's XML shape) → **ReportFormatter** (turns the jobs into CSV or HTML).
 
-* `retrievers.py` — `Retriever` (ABC) defines `all_jobs()` returning a generator function, plus
-  the shared `_job_builder()` factory method that decides which `JenkinsJob` subclass to
-  instantiate for a given job's parsed XML (dict, via `xmltodict`). Two concrete retrievers:
-  `RESTRetriever` (live Jenkins server via the `python-jenkins` package) and
-  `FileSystemRetriever` (reads a `shelve` file previously produced by `jenkins_exporter`). Both
-  yield the same job objects, which is what lets `jenkins_jobs` transparently work against a
-  cached snapshot instead of a live server.
+* `retrievers.py` — `Retriever` (ABC) defines `all_jobs()`, which **returns a generator
+  function** (callers do `jobs = retriever.all_jobs(); jobs()`), plus the shared `_job_builder()`
+  factory: a root `project` key → `FreestyleJob`; otherwise the root's `@plugin` attribute is
+  looked up in `Retriever.plugin_based_jobs` (`workflow-job` → `PipelineJob`, `maven-plugin` →
+  `MavenJob`). Unknown plugins raise `UnknownJobTypeError`; other missing keys raise
+  `InvalidXMLConfigError`. `RESTRetriever` uses `python-jenkins`; `FileSystemRetriever` reads the
+  shelve produced by the exporter. Both yield the same job objects.
 
-* `jobs.py` — `JenkinsJob` (ABC) is the base for all job types; subclasses must implement
-  `_find_desc(config)` and `_find_timer_trigger(config)` for their XML shape and get
-  `one_line_desc()`, `_clean_spec()`, and `__str__()` (the pipe-CSV formatter) for free.
-  `PluginBasedJob` is an intermediate ABC for jobs defined by a Jenkins plugin (detected by the
-  presence of an `@plugin` attribute on the XML root); `PipelineJob` and `MavenJob` extend it.
-  `FreestyleJob` extends `JenkinsJob` directly since freestyle jobs aren't plugin-based. Each
-  subclass encodes where, in that job type's specific (and undocumented) nested dict structure,
-  the description and `hudson.triggers.TimerTrigger` node live — this is the part of the codebase
-  that's most sensitive to Jenkins/plugin XML changes. New job types are added here and then
-  registered in `Retriever.plugin_based_jobs` (keyed by plugin name) or in `_job_builder()` for
-  non-plugin cases.
+* `jobs.py` — `JenkinsJob` (ABC) is the base for all job types; subclasses implement
+  `_find_desc(config)` and `_find_timer_trigger(config)` (the latter returns a
+  `TimerTriggerResult`) and inherit `one_line_desc()`, `_clean_spec()`, and `__str__()` (the
+  pipe-CSV line). `PluginBasedJob` is an intermediate ABC for plugin-defined jobs; `PipelineJob`
+  and `MavenJob` extend it. `FreestyleJob` extends `JenkinsJob` directly. Each subclass encodes
+  where, in its undocumented nested dict structure, the description and
+  `hudson.triggers.TimerTrigger` node live — the part of the codebase most sensitive to
+  Jenkins/plugin XML changes. To add a job type: subclass here, register it in
+  `Retriever.plugin_based_jobs` (or `_job_builder()` for non-plugin cases), and add fixture XML
+  (plus a bogus variant) to `tests/raw_data/`.
 
-* `exceptions.py` — all custom exceptions derive from `JenkinsJobError`. `MissingXMLElementError`
-  and `InvalidXMLConfigError` are raised when the parsed job XML doesn't have the structure a
-  `JenkinsJob` subclass expects (missing nodes are treated as data errors, not bugs, since the
-  XML shape is plugin-controlled and not officially documented).
+* `formatters.py` — `ReportFormatter` (ABC) with `generate(jobs) -> str`. `CSVFormatter` joins
+  `str(job)` lines; `HTMLFormatter` renders a `string.Template` page, groups counts by
+  `job.__class__.__name__`, and HTML-escapes every value. The `FORMATTERS` dict maps `--format`
+  values to classes and also drives the argparse `choices`, so a new format only needs a subclass
+  plus a `FORMATTERS` entry (and an output-file branch in `reporter.py`).
 
-* `reporter.py` / `exporter.py` — thin argparse-based CLI entry points. `exporter.py` always
-  requires `--user`/`--token`/`--jenkins`. `reporter.py` requires either those three together (REST
-  mode) or `--shelve-file` alone (local snapshot mode); either way, when REST mode is used, the
-  Jenkins URL is validated to have a schema (raising `NoSchemaSuppliedRESTError` otherwise, since a
-  missing schema produces a confusing error deep inside `requests` instead).
+* `exceptions.py` — all custom exceptions derive from `JenkinsJobError`. Missing XML nodes are
+  treated as data errors (`MissingXMLElementError`, `InvalidXMLConfigError`), not bugs, since the
+  XML shape is plugin-controlled.
 
-XML is parsed with `xmltodict`, so job configs move through the codebase as nested `dict`/
-`OrderedDict` structures mirroring the original XML — reading a fixture file in `tests/raw_data/`
-alongside the corresponding job class is usually the fastest way to understand a given job type's
-shape.
+* `reporter.py` / `exporter.py` — thin argparse CLI entry points (`main()` is marked
+  `# pragma: no cover`). In REST mode both reject a `--jenkins` URL without an `http` schema by
+  raising `NoSchemaSuppliedRESTError`, since a missing schema otherwise fails confusingly deep
+  inside `requests`.
+
+XML is parsed with `xmltodict`, so job configs move through the codebase as nested `dict`
+structures mirroring the original XML — reading a fixture in `tests/raw_data/` alongside the
+corresponding job class is usually the fastest way to understand a job type's shape.
