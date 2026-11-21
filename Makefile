@@ -98,7 +98,7 @@ debug:
 	uv run python -m pdb -m jenkins_jobs.reporter --shelve-file $(DATA_SAMPLE)
 
 run:
-	uv run jenkins_jobs --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
+	uv run jenkins-jobs --user $(USER) --token $(TOKEN) --jenkins $(SERVER)
 
 local:
-	uv run jenkins_jobs --shelve-file $(DATA_SAMPLE)
+	uv run jenkins-jobs --shelve-file $(DATA_SAMPLE)

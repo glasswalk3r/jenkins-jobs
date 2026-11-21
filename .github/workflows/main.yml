@@ -3,14 +3,21 @@ name: Python application
 
 on:  # yamllint disable-line rule:truthy
   push:
-    paths-ignore:
-      - '*.md'
-      - '*.rst'
-      - Makefile
-      - sample.py
+    paths:
+      - '**.py'
+      - pyproject.toml
+      - uv.lock
+      - tox.ini
+      - .github/workflows/main.yml
   pull_request:
     branches:
       - main
+    paths:
+      - '**.py'
+      - pyproject.toml
+      - uv.lock
+      - tox.ini
+      - .github/workflows/main.yml
 
 permissions:
   contents: read

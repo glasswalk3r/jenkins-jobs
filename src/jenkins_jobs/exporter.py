@@ -45,7 +45,7 @@ def main():  # pragma: no cover
             print('An exception ocurred while processing {0}: {1}'.format(
                 job['name'], str(e)), file=sys.stderr)
             print('Trying to continue...')
-            break
+            continue
 
     print('Finished')
 
